@@ -1,0 +1,25 @@
+[project]
+name = "ocular-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiosqlite>=0.20.0",
+    "mkdocs-material>=9.5.38",
+    "mkdocstrings[python]>=0.26.1",
+    "polars>=1.8.1",
+    "py-cord>=2.6.1",
+    "pytest-asyncio>=0.24.0",
+    "pytest>=8.3.3",
+    "python-dotenv>=1.0.1",
+    "ruff>=0.6.7",
+    "uuid6>=2024.7.10",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["D104"]
+"tests/*.py" = ["S101"]

@@ -1,0 +1,73 @@
+site_name: Ocular bot
+# site_url: https://mydomain.org/mysite
+# repo_url: https://github.com/aeon-tia/ocular-bot
+# repo_name: aeon-tia/ocular-bot
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            docstring_section_style: table
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            parameter_headings: true
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_root_toc_entry: false
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.tracking
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+nav:
+  - Home:
+    - index.md
+  - User guide:
+    - user-guide/commands.md
+    - Item names: user-guide/entry-names.md
+  - API reference:
+    - api-reference/operations.md
