@@ -1,4 +1,4 @@
-"""Ocular bot - Discord bot for tracking FFXIV mount progress. temp"""
+"""Ocular bot - Discord bot for tracking FFXIV mount progress."""
 import logging
 import os
 import platform
