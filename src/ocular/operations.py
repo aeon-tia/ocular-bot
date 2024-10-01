@@ -1,6 +1,7 @@
 """Database operations for discord bot."""
 
 import asyncio
+from pathlib import Path
 from typing import Literal, Self
 
 import aiosqlite
@@ -155,6 +156,9 @@ class DataBase:
 
     async def init_tables(self: Self) -> None:
         """Initialize database tables."""
+        data_dir = Path("./data")
+        if not data_dir.is_dir():
+            data_dir.mkdir()
         await self.init_user_table()
         await self.init_raid_table()
         await self.init_trial_table()
