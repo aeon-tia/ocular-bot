@@ -1,6 +1,5 @@
 """Database operations for discord bot."""
 
-import asyncio
 from pathlib import Path
 from typing import Literal, Self
 
@@ -350,16 +349,3 @@ class DataBase:
         for item in items:
             params = (has_item_entry, user, item_kind, item)
             await self.db_execute_qmark(query, params)
-
-
-async def main() -> None:
-    """Run program."""
-    database = DataBase()
-    await database.init_tables()
-    await database.append_new_user("aeon", 0)
-    await database.append_new_user_status("aeon")
-    # await database.update_user_items("remove", "aeon", "trials", "garuda")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
