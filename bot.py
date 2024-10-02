@@ -24,10 +24,11 @@ async def oping(ctx: discord.ApplicationContext) -> None:
 
 
 @bot.slash_command(name="oinitdb", description="Initialize database.")
-async def oinit_db() -> None:
+async def oinit_db(ctx: discord.ApplicationContext) -> None:
     """Create the bot database."""
     database = DataBase()
     await database.init_tables()
+    await ctx.respond("Database intialized.")
 
 
 bot.run(os.getenv("TOKEN"))
