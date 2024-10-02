@@ -9,61 +9,31 @@ from typing import Self
 import discord
 import yaml
 from discord.ext import commands
-from discord.ext.commands import Context
 from dotenv import load_dotenv
 
 from src.ocular.operations import DataBase
 
-# Set config
-with Path.open("./config.yml") as file:
-    config = yaml.safe_load(file)
-
-# Set logging
-logging.basicConfig(
-    format="%(asctime)s | %(levelname)-8s | %(message)s",
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
-# Set bot intents
-intents = discord.Intents.default()
-
-
-class DiscordBot(commands.Bot):
-    """Commands for interfacing with the bot."""
-
-    def __init__(self: Self) -> None:
-        """Interface for ocular bot."""
-        super().__init__(
-            command_prefix=config["prefix"],
-            intents=intents,
-            help_command=None,
-        )
-
-    async def init_db(self: Self) -> None:
-        """Create the bot database."""
-        database = DataBase()
-        await database.init_tables()
-
-    async def on_message(self, message: discord.Message) -> None:
-        """Read messages sent in channel, prefix or not."""
-        if message.author == self.user or message.author.bot:
-            return
-        await self.process_commands(message)
-
-    async def get_id(self: Self, user: discord.User) -> None:
-        """Get the discord ID of the user invoking a command.
-
-        Parameters
-        ----------
-        user : discord.User
-            API object with user information.
-
-        """
-        return user.id
-
-
 load_dotenv()
+bot = discord.Bot()
 
-bot = DiscordBot()
+
+async def get_id(message: discord.Message) -> None:
+    """Get the discord ID of the user invoking a command.
+
+    Parameters
+    ----------
+    message : discord.Message
+        API object with message and sender information.
+
+    """
+    return message.author.id
+
+
+@bot.slash_command(name="initdb", description="Initialize database.")
+async def init_db() -> None:
+    """Create the bot database."""
+    database = DataBase()
+    await database.init_tables()
+
+
 bot.run(os.getenv("TOKEN"))
