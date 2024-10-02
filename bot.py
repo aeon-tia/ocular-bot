@@ -1,14 +1,8 @@
 """Ocular bot - Discord bot for tracking FFXIV mount progress."""
 
-import logging
 import os
-import platform
-from pathlib import Path
-from typing import Self
 
 import discord
-import yaml
-from discord.ext import commands
 from dotenv import load_dotenv
 
 from src.ocular.operations import DataBase
