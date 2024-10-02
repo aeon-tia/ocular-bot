@@ -45,6 +45,12 @@ class DiscordBot(commands.Bot):
         database = DataBase()
         await database.init_tables()
 
+    async def on_message(self, message: discord.Message) -> None:
+        """Read messages sent in channel, prefix or not."""
+        if message.author == self.user or message.author.bot:
+            return
+        await self.process_commands(message)
+
     async def get_id(self: Self, user: discord.User) -> None:
         """Get the discord ID of the user invoking a command.
 
