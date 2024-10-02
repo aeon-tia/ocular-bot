@@ -14,7 +14,7 @@ bot = discord.Bot()
 @bot.event
 async def on_ready() -> None:
     """Print status message when bot comes online."""
-    print(f"{bot.user} is ready and online!")  # noqa: T201
+    print(f"{bot.user} is ready!")  # noqa: T201
 
 
 @bot.slash_command(name="oping", description="Confirm the bot is responsive.")
