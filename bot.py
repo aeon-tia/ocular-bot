@@ -1,4 +1,5 @@
 """Ocular bot - Discord bot for tracking FFXIV mount progress."""
+
 import logging
 import os
 import platform
@@ -33,7 +34,11 @@ class DiscordBot(commands.Bot):
 
     def __init__(self: Self) -> None:
         """Interface for ocular bot."""
-        super().__init__(command_prefix="/", intents=intents, help_command=None)
+        super().__init__(
+            command_prefix=config["prefix"],
+            intents=intents,
+            help_command=None,
+        )
 
     async def init_db(self: Self) -> None:
         """Create the bot database."""
