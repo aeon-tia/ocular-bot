@@ -17,14 +17,14 @@ async def on_ready() -> None:
     print(f"{bot.user} is ready and online!")  # noqa: T201
 
 
-@bot.slash_command(name="squeak", description="Confirm the bot is responsive.")
-async def squeak(ctx: discord.ApplicationContext) -> None:
+@bot.slash_command(name="oping", description="Confirm the bot is responsive.")
+async def oping(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
-    await ctx.respond("Sqrk!")
+    await ctx.respond("I'm online!")
 
 
-@bot.slash_command(name="initdb", description="Initialize database.")
-async def init_db() -> None:
+@bot.slash_command(name="oinitdb", description="Initialize database.")
+async def oinit_db() -> None:
     """Create the bot database."""
     database = DataBase()
     await database.init_tables()
