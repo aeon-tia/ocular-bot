@@ -2,14 +2,20 @@
 import logging
 import os
 import platform
+from pathlib import Path
 from typing import Self
 
 import discord
+import yaml
 from discord.ext import commands
 from discord.ext.commands import Context
 from dotenv import load_dotenv
 
 from ocular import Database
+
+# Set config
+with Path.open("./config.yml") as file:
+    config = yaml.safe_load(file)
 
 # Set logging
 logging.basicConfig(
