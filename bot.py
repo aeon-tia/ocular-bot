@@ -11,7 +11,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from dotenv import load_dotenv
 
-from ocular import Database
+from src.ocular.operations import DataBase
 
 # Set config
 with Path.open("./config.yml") as file:
@@ -37,7 +37,7 @@ class DiscordBot(commands.Bot):
 
     async def init_db(self: Self) -> None:
         """Create the bot database."""
-        database = Database()
+        database = DataBase()
         await database.init_tables()
 
     async def get_id(self: Self, user: discord.User) -> None:
