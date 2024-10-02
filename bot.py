@@ -22,6 +22,17 @@ async def get_id(message: discord.Message) -> None:
     """
     return message.author.id
 
+@bot.event
+async def on_ready() -> None:
+    """Print status message when bot comes online."""
+    print(f"{bot.user} is ready and online!")  # noqa: T201
+
+
+@bot.slash_command(name="squeak", description="Confirm the bot is responsive.")
+async def squeak(ctx: discord.ApplicationContext) -> None:
+    """Check if the bot responds."""
+    await ctx.respond("Sqrk!")
+
 
 @bot.slash_command(name="initdb", description="Initialize database.")
 async def init_db() -> None:
