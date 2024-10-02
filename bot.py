@@ -11,17 +11,6 @@ load_dotenv()
 bot = discord.Bot()
 
 
-async def get_id(message: discord.Message) -> None:
-    """Get the discord ID of the user invoking a command.
-
-    Parameters
-    ----------
-    message : discord.Message
-        API object with message and sender information.
-
-    """
-    return message.author.id
-
 @bot.event
 async def on_ready() -> None:
     """Print status message when bot comes online."""
