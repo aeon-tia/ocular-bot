@@ -33,7 +33,7 @@ async def oinit_db(ctx: discord.ApplicationContext) -> None:
 
 @bot.slash_command(
     name="oadd",
-    description="Add mounts to your list. Option `kind` must be 'trials' or 'raids'. Option `names` must be a comma-separated list of mount names."
+    description="Add mounts to your list. Option `kind` must be 'trials' or 'raids'. Option `names` must be a single mount name or a comma-separated list of mount names, e.g., 'ifrit,titan'."
 )
 async def oadd(
     ctx: discord.ApplicationContext,
@@ -49,6 +49,26 @@ async def oadd(
         item_names=names,
     )
     await ctx.respond(f"Added mounts: {names}")
+
+
+@bot.slash_command(
+    name="oremove",
+    description="Remove mounts from your list. Option `kind` must be 'trials' or 'raids'. Option `names` must be a single mount name or a comma-separated list of mount names, e.g., 'ifrit,titan'."
+)
+async def oremove(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    names: discord.Option(str),
+) -> None:
+    """Add items to a user in the status table."""
+    database = DataBase()
+    await database.update_user_items(
+        user=ctx.author.id,
+        action="remove",
+        item_kind=kind,
+        item_names=names,
+    )
+    await ctx.respond(f"Removed mounts: {names}")
 
 
 bot.run(os.getenv("TOKEN"))
