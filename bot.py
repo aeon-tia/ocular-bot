@@ -31,6 +31,29 @@ async def oinit_db(ctx: discord.ApplicationContext) -> None:
     await ctx.respond("Database intialized.")
 
 
+@bot.slash_command(name="oiam", description="Add yourself to the bot's user list.")
+async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
+    """Add user to the user table."""
+    database = DataBase()
+    # Check if user name is already added
+    name_exists = await database.check_user_exists(
+        check_col="user_name",
+        check_val=name,
+    )
+    # Check if discord ID is already added
+    id_exists = await database.check_user_exists(
+        check_col="discord_id",
+        check_val=ctx.author.id,
+    )
+    if name_exists:
+        await ctx.respond("I already have a user with this name in my database.")
+    if id_exists:
+        await ctx.respond("I already have a user with your discord ID in my database.")
+    await database.append_new_user(name=name, discord_id=ctx.author.id)
+    await database.append_new_status(discord_id=ctx.author.id)
+    await ctx.respond(f"You have been added as {name} in the database.")
+
+
 @bot.slash_command(name="oadd", description="Add mounts to your list.")
 async def oadd(
     ctx: discord.ApplicationContext,
