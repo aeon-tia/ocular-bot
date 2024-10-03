@@ -3,6 +3,7 @@
 import os
 
 import discord
+from discord.ext import commands
 from dotenv import load_dotenv
 
 from src.ocular.operations import DataBase
@@ -24,6 +25,7 @@ async def oping(ctx: discord.ApplicationContext) -> None:
 
 
 @bot.slash_command(name="oinitdb", description="Initialize database.")
+@commands.is_owner()
 async def oinit_db(ctx: discord.ApplicationContext) -> None:
     """Create the bot database."""
     database = DataBase()
