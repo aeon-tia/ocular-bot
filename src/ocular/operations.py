@@ -302,9 +302,9 @@ class DataBase:
             table = pl.DataFrame(await self.get_status_table())
         return table
 
-    async def append_new_user_status(self: Self, user_name: str) -> tuple[dict]:
+    async def append_new_status(self: Self, discord_id: str) -> tuple[dict]:
         """Create status table rows for a new user."""
-        user = await self.get_user_id(user_name)
+        user = await self.get_user_from_discord_id(discord_id)
         trials = await self.read_table_polars("trials")
         raids = await self.read_table_polars("raids")
         trials = trials.select(["item_id"]).with_columns(item_kind=pl.lit("trials"))
@@ -368,7 +368,7 @@ class DataBase:
     async def check_user_exists(
         self: Self,
         check_col: Literal["user_name", "user_id", "discord_id"],
-        check_val: str,
+        check_val: str | int,
     ) -> bool:
         """Check if a user already exists in the users table."""
         table = await self.read_table_polars("users")
