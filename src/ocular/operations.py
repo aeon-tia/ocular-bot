@@ -56,50 +56,50 @@ class DataBase:
     async def init_trial_table(self: Self) -> tuple[dict]:
         """Create rows for initializing trials table."""
         rows = (
-            {"item_id": 0, "item_name": "ifrit"},
-            {"item_id": 1, "item_name": "titan"},
-            {"item_id": 2, "item_name": "garuda"},
-            {"item_id": 3, "item_name": "leviathan"},
-            {"item_id": 4, "item_name": "ramuh"},
-            {"item_id": 5, "item_name": "shiva"},
-            {"item_id": 6, "item_name": "bismark"},
-            {"item_id": 7, "item_name": "ravana"},
-            {"item_id": 8, "item_name": "thordan"},
-            {"item_id": 9, "item_name": "sephirot"},
-            {"item_id": 10, "item_name": "nidhogg"},
-            {"item_id": 11, "item_name": "sophia"},
-            {"item_id": 12, "item_name": "zurvan"},
-            {"item_id": 13, "item_name": "susano"},
-            {"item_id": 14, "item_name": "lakshmi"},
-            {"item_id": 15, "item_name": "shinryu"},
-            {"item_id": 16, "item_name": "byakko"},
-            {"item_id": 17, "item_name": "tsukuyomi"},
-            {"item_id": 18, "item_name": "suzaku"},
-            {"item_id": 19, "item_name": "seiryu"},
-            {"item_id": 20, "item_name": "titania"},
-            {"item_id": 21, "item_name": "innocence"},
-            {"item_id": 22, "item_name": "hades"},
-            {"item_id": 23, "item_name": "warrior of light"},
-            {"item_id": 24, "item_name": "ruby"},
-            {"item_id": 25, "item_name": "emerald"},
-            {"item_id": 26, "item_name": "diamond"},
-            {"item_id": 27, "item_name": "zodiark"},
-            {"item_id": 28, "item_name": "hydaelyn"},
-            {"item_id": 29, "item_name": "endsinger"},
-            {"item_id": 30, "item_name": "barbariccia"},
-            {"item_id": 31, "item_name": "rubicante"},
-            {"item_id": 32, "item_name": "golbez"},
-            {"item_id": 33, "item_name": "zeromus"},
-            {"item_id": 34, "item_name": "valigarmanda"},
-            {"item_id": 35, "item_name": "zoraal ja"},
-            {"item_id": 36, "item_name": "ex3"},
-            {"item_id": 37, "item_name": "ex4"},
-            {"item_id": 38, "item_name": "ex5"},
-            {"item_id": 39, "item_name": "ex6"},
-            {"item_id": 40, "item_name": "ex7"},
+            {"item_id": "1ef80ff70ffd6960b01abb534c65c291", "item_name": "ifrit"},
+            {"item_id": "1ef80ffa63336c2991c31f00cd8dd05b", "item_name": "titan"},
+            {"item_id": "1ef80ffa890e6a46a98f77df0bb46b2c", "item_name": "garuda"},
+            {"item_id": "1ef80ffaa96867e6a2d02eb27278b71b", "item_name": "leviathan"},
+            {"item_id": "1ef80ffacb066434bd0424dc8fe8a7eb", "item_name": "ramuh"},
+            {"item_id": "1ef80ffaf60a60dcb7bad86156499d73", "item_name": "shiva"},
+            {"item_id": "1ef80ffaf83a6007afbd82b6a222010a", "item_name": "bismark"},
+            {"item_id": "1ef80ffb505c6162857184d477996934", "item_name": "ravana"},
+            {"item_id": "1ef80ffb76236079a919fa5ae59fd65f", "item_name": "thordan"},
+            {"item_id": "1ef80ffba5e568e5b111370abb00cce8", "item_name": "sephirot"},
+            {"item_id": "1ef80ffbd7f86162b1c56eb04b60c1c0", "item_name": "nidhogg"},
+            {"item_id": "1ef80ffbfe1367a4a20eeedcfb31054f", "item_name": "sophia"},
+            {"item_id": "1ef80ffc2dde6e9db8d6f0f24ae42805", "item_name": "zurvan"},
+            {"item_id": "1ef80ffc5681618a9774c212295a64ae", "item_name": "susano"},
+            {"item_id": "1ef80ffc76516bc3b9cebbdf6c6bb413", "item_name": "lakshmi"},
+            {"item_id": "1ef80ffc95306887b4a9183dbb17d347", "item_name": "shinryu"},
+            {"item_id": "1ef80ffcb84862a089d6e9194504b110", "item_name": "byakko"},
+            {"item_id": "1ef80ffce3856339a756f3c070d68d43", "item_name": "tsukuyomi"},
+            {"item_id": "1ef80ffd08be6ba29baeb490dd052ead", "item_name": "suzaku"},
+            {"item_id": "1ef80ffd2eb96d2c9598fafb76925b39", "item_name": "seiryu"},
+            {"item_id": "1ef80ffd515e67e3b33a8dbadfcc6b94", "item_name": "titania"},
+            {"item_id": "1ef80ffd746d6c409b0de4d89a034e4a", "item_name": "innocence"},
+            {"item_id": "1ef80ffd9f5c6747ab3286754dda6e86", "item_name": "hades"},
+            {"item_id": "1ef80ffdc2b26d4bb95bac59aa95d24f", "item_name": "warrior of light"},  # noqa: E501
+            {"item_id": "1ef80ffde76064caae966498d2afe780", "item_name": "ruby"},
+            {"item_id": "1ef80ffe0d9b6bdd8d44335b1818ed5d", "item_name": "emerald"},
+            {"item_id": "1ef80ffe4298659e978aa7d2a1bf0fdf", "item_name": "diamond"},
+            {"item_id": "1ef80ffe79ee68d5806f0712c2f8cc23", "item_name": "zodiark"},
+            {"item_id": "1ef80ffea0a166d7b6194c0b31411a3f", "item_name": "hydaelyn"},
+            {"item_id": "1ef80ffee8dd64f7b182a494cbd76ced", "item_name": "endsinger"},
+            {"item_id": "1ef80fff0fe8683b9911b093c4d519aa", "item_name": "barbariccia"},
+            {"item_id": "1ef80fff33626d1cbd8c7933467142fd", "item_name": "rubicante"},
+            {"item_id": "1ef80fff59e768d9af42c3daf49bbe39", "item_name": "golbez"},
+            {"item_id": "1ef80fff7a0163dba7162e4940e5b5c5", "item_name": "zeromus"},
+            {"item_id": "1ef80fffa28f6a4682772c5db44f322d", "item_name": "valigarmanda"},  # noqa: E501
+            {"item_id": "1ef80fffcfbb6c799d37ae1f2bb1d0f8", "item_name": "zoraal ja"},
+            {"item_id": "1ef80ffffe13647da64e20f17c5c1705", "item_name": "ex3"},
+            {"item_id": "1ef8100022d46b74935baeadef79390a", "item_name": "ex4"},
+            {"item_id": "1ef8100047736b5fac70fb51f2457913", "item_name": "ex5"},
+            {"item_id": "1ef8100085da6e36a9f834a6e987df45", "item_name": "ex6"},
+            {"item_id": "1ef81000a370618f89ddb7962bf566a9", "item_name": "ex7"},
         )
         query = """
-            CREATE TABLE IF NOT EXISTS trials(item_id INTEGER, item_name STRING)
+            CREATE TABLE IF NOT EXISTS trials(item_id STRING, item_name STRING)
         """
         await self.db_execute_literal(query)
         await self.append_to_trial_table(rows)
@@ -107,27 +107,27 @@ class DataBase:
     async def init_raid_table(self: Self) -> tuple[dict]:
         """Create rows for initializing raid table."""
         rows = (
-            {"item_id": 0, "item_name": "t5"},
-            {"item_id": 1, "item_name": "t9"},
-            {"item_id": 2, "item_name": "t13"},
-            {"item_id": 3, "item_name": "a4s"},
-            {"item_id": 4, "item_name": "a8s"},
-            {"item_id": 5, "item_name": "a12s"},
-            {"item_id": 6, "item_name": "o4s"},
-            {"item_id": 7, "item_name": "o8s"},
-            {"item_id": 8, "item_name": "o12s"},
-            {"item_id": 9, "item_name": "e4s"},
-            {"item_id": 10, "item_name": "e8s"},
-            {"item_id": 11, "item_name": "e12s"},
-            {"item_id": 12, "item_name": "p4s"},
-            {"item_id": 13, "item_name": "p8s"},
-            {"item_id": 14, "item_name": "p12s"},
-            {"item_id": 15, "item_name": "m4s"},
-            {"item_id": 16, "item_name": "m8s"},
-            {"item_id": 17, "item_name": "m12s"},
+            {"item_id": "1ef81000d4c36649b84f4ae79a73c4e3", "item_name": "t5"},
+            {"item_id": "1ef81000f621617694ba05b091bc104f", "item_name": "t9"},
+            {"item_id": "1ef810011ee06ec9bde84b794f1da23e", "item_name": "t13"},
+            {"item_id": "1ef8100146226255aa395042061349c5", "item_name": "a4s"},
+            {"item_id": "1ef81001674f606c9310b74e20d7eec3", "item_name": "a8s"},
+            {"item_id": "1ef8100189cc60e9a7ad6b069c1d4dcf", "item_name": "a12s"},
+            {"item_id": "1ef81001aec2687fa4f5cc5fb3627eb8", "item_name": "o4s"},
+            {"item_id": "1ef81001d4ab662e8cdc48c6f2c08504", "item_name": "o8s"},
+            {"item_id": "1ef8100202806fecac32a3d3f5c6a4be", "item_name": "o12s"},
+            {"item_id": "1ef8100227c56063a8335d4cef6ea9d2", "item_name": "e4s"},
+            {"item_id": "1ef8100249f76bdcbb2d8baf0afa2139", "item_name": "e8s"},
+            {"item_id": "1ef810026de064a7971e2a8145de4585", "item_name": "e12s"},
+            {"item_id": "1ef8100293886c2a81feddefd16a427e", "item_name": "p4s"},
+            {"item_id": "1ef81002b6ed627aa66d7c9192129a41", "item_name": "p8s"},
+            {"item_id": "1ef81002ddb76acbb2aefe536aff7112", "item_name": "p12s"},
+            {"item_id": "1ef81002fe9168b297564a08de8aab21", "item_name": "m4s"},
+            {"item_id": "1ef81003215e6a58a071afd835bf5bad", "item_name": "m8s"},
+            {"item_id": "1ef8100346576365a7bb56b58babea2b", "item_name": "m12s"},
         )
         query = """
-            CREATE TABLE IF NOT EXISTS raids(item_id INTEGER, item_name STRING)
+            CREATE TABLE IF NOT EXISTS raids(item_id STRING, item_name STRING)
         """
         await self.db_execute_literal(query)
         await self.append_to_raid_table(rows)
@@ -146,7 +146,7 @@ class DataBase:
             CREATE TABLE IF NOT EXISTS
             status(
                 user_id STRING,
-                item_id INTEGER,
+                item_id STRING,
                 item_kind STRING,
                 has_item INTEGER
             )
