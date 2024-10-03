@@ -164,8 +164,7 @@ class DataBase:
     async def init_tables(self: Self) -> None:
         """Initialize database tables."""
         data_dir = Path("./data")
-        if not data_dir.is_dir():
-            data_dir.mkdir()
+        data_dir.mkdir(parents=True, exist_ok=True)
         await self.init_user_table()
         await self.init_raid_table()
         await self.init_trial_table()
