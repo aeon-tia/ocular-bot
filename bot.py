@@ -60,7 +60,7 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
 async def oadd(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    names: discord.Option(str),
+    names: discord.Option(str),  # TODO@aeon-tia: Make a db method to populate choices
 ) -> None:
     """Add items to a user in the status table."""
     database = DataBase()
@@ -77,7 +77,7 @@ async def oadd(
 async def oremove(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    names: discord.Option(str),
+    names: discord.Option(str),  # TODO@aeon-tia: Make a db method to populate choices
 ) -> None:
     """Add items to a user in the status table."""
     database = DataBase()
