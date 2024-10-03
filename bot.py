@@ -31,4 +31,24 @@ async def oinit_db(ctx: discord.ApplicationContext) -> None:
     await ctx.respond("Database intialized.")
 
 
+@bot.slash_command(
+    name="oadd",
+    description="Add mounts to your list. Option `kind` must be 'trials' or 'raids'. Option `names` must be a comma-separated list of mount names."
+)
+async def oadd(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    names: discord.Option(str),
+) -> None:
+    """Add items to a user in the status table."""
+    database = DataBase()
+    await database.update_user_items(
+        user=ctx.author.id,
+        action="add",
+        item_kind=kind,
+        item_names=names,
+    )
+    await ctx.respond(f"Added mounts: {names}")
+
+
 bot.run(os.getenv("TOKEN"))
