@@ -31,10 +31,7 @@ async def oinit_db(ctx: discord.ApplicationContext) -> None:
     await ctx.respond("Database intialized.")
 
 
-@bot.slash_command(
-    name="oadd",
-    description="Add mounts to your list. Option `kind` must be 'trials' or 'raids'. Option `names` must be a single mount name or a comma-separated list of mount names, e.g., 'ifrit,titan'."
-)
+@bot.slash_command(name="oadd", description="Add mounts to your list.")
 async def oadd(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
@@ -51,10 +48,7 @@ async def oadd(
     await ctx.respond(f"Added mounts: {names}")
 
 
-@bot.slash_command(
-    name="oremove",
-    description="Remove mounts from your list. Option `kind` must be 'trials' or 'raids'. Option `names` must be a single mount name or a comma-separated list of mount names, e.g., 'ifrit,titan'."
-)
+@bot.slash_command(name="oremove", description="Remove mounts from your list.")
 async def oremove(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
