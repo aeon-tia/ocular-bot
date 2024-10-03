@@ -364,4 +364,4 @@ class DataBase:
     ) -> bool:
         """Check the shape of a database table."""
         table = await self.read_table_polars(table_name)
-        return table.shape  # noqa: RET504
+        return table.shape
