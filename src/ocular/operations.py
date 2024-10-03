@@ -102,6 +102,10 @@ class DataBase:
             CREATE TABLE IF NOT EXISTS trials(item_id STRING, item_name STRING)
         """
         await self.db_execute_literal(query)
+        table_shape = await self.check_table_shape("trials")
+        if table_shape != (0, 0):
+            msg = "Trials table is not empty, initial rows not appended."
+            raise AssertionError(msg)
         await self.append_to_trial_table(rows)
 
     async def init_raid_table(self: Self) -> tuple[dict]:
@@ -130,6 +134,10 @@ class DataBase:
             CREATE TABLE IF NOT EXISTS raids(item_id STRING, item_name STRING)
         """
         await self.db_execute_literal(query)
+        table_shape = await self.check_table_shape("raids")
+        if table_shape != (0, 0):
+            msg = "Raids table is not empty, initial rows not appended."
+            raise AssertionError(msg)
         await self.append_to_raid_table(rows)
 
     async def init_user_table(self: Self) -> None:
@@ -349,3 +357,11 @@ class DataBase:
         for item in items:
             params = (has_item_entry, user, item_kind, item)
             await self.db_execute_qmark(query, params)
+
+    async def check_table_shape(
+        self: Self,
+        table_name: Literal["users", "trials", "raids", "status"],
+    ) -> bool:
+        """Check the shape of a database table."""
+        table = await self.read_table_polars(table_name)
+        return table.shape  # noqa: RET504
