@@ -376,3 +376,11 @@ class DataBase:
             table.filter(pl.col(check_col) == check_val).select("user_id").is_empty()
         )
         return not table_empty
+
+    async def list_item_names(
+            self: Self,
+            table_name: Literal["trials", "raids"],
+    ) -> list[str]:
+        """Get a list of item names from a DB table."""
+        table = await self.read_table_polars(table_name)
+        return table.select("item_name").to_series().to_list()
