@@ -1,5 +1,6 @@
 """Ocular bot - Discord bot for tracking FFXIV mount progress."""
 
+import asyncio
 import os
 
 import discord
@@ -10,6 +11,17 @@ from src.ocular.operations import DataBase
 
 load_dotenv()
 bot = discord.Bot()
+
+
+async def get_mount_names() -> list[str]:
+    """List available mount names."""
+    database = DataBase()
+    trials = await database.list_item_names("trials")
+    raids = await database.list_item_names("raids")
+    return trials + raids
+
+# Run to get list for command autocomplete choices
+mount_names = asyncio.run(get_mount_names())
 
 
 @bot.event
@@ -60,7 +72,7 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
 async def oadd(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    names: discord.Option(str),  # TODO@aeon-tia: Make a db method to populate choices
+    names: discord.Option(str),
 ) -> None:
     """Add items to a user in the status table."""
     database = DataBase()
@@ -77,7 +89,7 @@ async def oadd(
 async def oremove(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    names: discord.Option(str),  # TODO@aeon-tia: Make a db method to populate choices
+    names: discord.Option(str),
 ) -> None:
     """Add items to a user in the status table."""
     database = DataBase()
