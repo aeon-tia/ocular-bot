@@ -623,7 +623,23 @@ class DataBase:
     async def list_item_names(
         self: Self,
         table_name: Literal["trials", "raids"],
+        expansion_name: None
+        | Literal[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+        ] = None,
     ) -> list[str]:
         """Get a list of item names from a DB table."""
         table = await self.read_table_polars(table_name)
-        return table.select("item_name").to_series().to_list()
+        if expansion_name is None:
+            return table.select("item_name").to_series().to_list()
+        return (
+                table.filter(pl.col("item_expac") == expansion_name)
+                .select("item_name")
+                .to_series()
+                .to_list()
+            )
