@@ -1,10 +1,8 @@
 """Ocular bot - Discord bot for tracking FFXIV mount progress."""
 
-import asyncio
 import os
 
 import discord
-from discord.ext import commands
 from dotenv import load_dotenv
 
 from src.ocular.operations import DataBase
@@ -15,7 +13,9 @@ bot = discord.Bot()
 
 @bot.event
 async def on_ready() -> None:
-    """Print status message when bot comes online."""
+    """Create DB and print status message when bot comes online."""
+    database = DataBase()
+    await database.init_tables()
     print(f"{bot.user} is ready!")  # noqa: T201
 
 
@@ -84,8 +84,6 @@ async def oremove(
 
 def main() -> None:
     """Run program."""
-    database = DataBase()
-    database.init_tables()
     bot.run(os.getenv("TOKEN"))
 
 
