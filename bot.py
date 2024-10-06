@@ -13,17 +13,6 @@ load_dotenv()
 bot = discord.Bot()
 
 
-async def get_mount_names() -> list[str]:
-    """List available mount names."""
-    database = DataBase()
-    trials = await database.list_item_names("trials")
-    raids = await database.list_item_names("raids")
-    return trials + raids
-
-# Run to get list for command autocomplete choices
-mount_names = asyncio.run(get_mount_names())
-
-
 @bot.event
 async def on_ready() -> None:
     """Print status message when bot comes online."""
@@ -34,15 +23,6 @@ async def on_ready() -> None:
 async def oping(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
     await ctx.respond("I'm online!")
-
-
-@bot.slash_command(name="oinitdb", description="Initialize database.")
-@commands.is_owner()
-async def oinit_db(ctx: discord.ApplicationContext) -> None:
-    """Create the bot database."""
-    database = DataBase()
-    await database.init_tables()
-    await ctx.respond("Database intialized.")
 
 
 @bot.slash_command(name="oiam", description="Add yourself to the bot's user list.")
@@ -102,4 +82,12 @@ async def oremove(
     await ctx.respond(f"Removed mounts: {names}")
 
 
-bot.run(os.getenv("TOKEN"))
+def main() -> None:
+    """Run program."""
+    database = DataBase()
+    database.init_tables()
+    bot.run(os.getenv("TOKEN"))
+
+
+if __name__ == "__main__":
+    main()
