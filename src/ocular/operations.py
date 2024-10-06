@@ -164,11 +164,12 @@ class DataBase:
     async def init_tables(self: Self) -> None:
         """Initialize database tables."""
         data_dir = Path("./data")
-        data_dir.mkdir(parents=True, exist_ok=True)
-        await self.init_user_table()
-        await self.init_raid_table()
-        await self.init_trial_table()
-        await self.init_status_table()
+        if not data_dir.joinpath("bot.db").exists():
+            data_dir.mkdir(parents=True, exist_ok=True)
+            await self.init_user_table()
+            await self.init_raid_table()
+            await self.init_trial_table()
+            await self.init_status_table()
 
     def create_user_row(self: Self, name: str, discord_id: int) -> tuple[dict]:
         """Create a new user ID as a row for the user table."""
