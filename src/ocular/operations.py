@@ -573,12 +573,12 @@ class DataBase:
     async def update_user_items(
         self: Self,
         action: Literal["add", "remove"],
-        user_name: str,
+        user: int,
         item_kind: Literal["trials", "raids"],
         item_names: list[str],
     ) -> tuple[dict]:
         """Update entries for a user in the status table."""
-        user = await self.get_user_id(user_name)
+        user_id = await self.get_user_from_discord_id(user)
         items = await self.get_item_ids(item_kind, item_names)
         if action == "add":
             has_item_entry = 1
@@ -593,7 +593,7 @@ class DataBase:
             WHERE user_id = ? AND item_kind = ? AND item_id = ?
         """
         for item in items:
-            params = (has_item_entry, user, item_kind, item)
+            params = (has_item_entry, user_id, item_kind, item)
             await self.db_execute_qmark(query, params)
 
     async def check_table_shape(
