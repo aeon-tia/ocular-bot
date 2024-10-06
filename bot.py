@@ -18,7 +18,7 @@ async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
         table_name=ctx.options["kind"],
         expansion_name=ctx.options["expansion"],
     )
-    return mounts
+    return mounts  # noqa: RET504
 
 
 @bot.event
