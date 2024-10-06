@@ -611,10 +611,12 @@ class DataBase:
     ) -> bool:
         """Check if a user already exists in the users table."""
         table = await self.read_table_polars("users")
-        table_empty = not (
-            table.filter(pl.col(check_col) == check_val).select("user_id").is_empty()
-        )
-        return not table_empty
+        if table.shape[0] != 0:
+            table_empty = not (
+                table.filter(pl.col(check_col) == check_val).select("user_id").is_empty()
+            )
+            return not table_empty
+        return False
 
     async def list_item_names(
         self: Self,
