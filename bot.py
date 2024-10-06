@@ -11,6 +11,16 @@ load_dotenv()
 bot = discord.Bot()
 
 
+async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
+    """Fetch list of mount names for autocomplete."""
+    database = DataBase()
+    mounts = await database.list_item_names(
+        table_name=ctx.options["kind"],
+        expansion_name=ctx.options["expansion"],
+    )
+    return mounts
+
+
 @bot.event
 async def on_ready() -> None:
     """Create DB and print status message when bot comes online."""
@@ -48,38 +58,108 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
     await ctx.respond(f"You have been added as {name} in the database.")
 
 
+@bot.slash_command(name="omounts", description="List available mount names.")
+async def omounts(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    expansion: discord.Option(
+        str,
+        choices=[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalkers",
+            "dawntrail",
+        ],
+    ),
+) -> None:
+    """Show a list of available mount names."""
+    database = DataBase()
+    item_names = await database.list_item_names(
+        table_name=kind,
+        expansion_name=expansion,
+    )
+    embed = discord.Embed(
+        title=f"{expansion.capitalize()} {kind} mounts",
+        description=f"Available mount names are: \n - {'\n - '.join(item_names)}",
+        color=discord.Colour.blurple(),
+    )
+    await ctx.respond(embed=embed)
+
+
 @bot.slash_command(name="oadd", description="Add mounts to your list.")
 async def oadd(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    names: discord.Option(str),
+    expansion: discord.Option(
+        str,
+        choices=[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+        ],
+    ),
+    names: discord.Option(
+        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
+    ),
 ) -> None:
     """Add items to a user in the status table."""
     database = DataBase()
-    await database.update_user_items(
-        user=ctx.author.id,
-        action="add",
-        item_kind=kind,
-        item_names=names,
-    )
-    await ctx.respond(f"Added mounts: {names}")
+    item_names = await database.list_item_names(kind)
+    items_dne = list(set(names.split(",")) - set(item_names))
+    if len(items_dne) != 0:
+        await ctx.respond(
+            f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+        )
+    else:
+        await database.update_user_items(
+            action="add",
+            user=ctx.author.id,
+            item_kind=kind,
+            item_names=names,
+        )
+        await ctx.respond(f"Added {expansion} mounts: {names}")
 
 
 @bot.slash_command(name="oremove", description="Remove mounts from your list.")
 async def oremove(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    names: discord.Option(str),
+    expansion: discord.Option(
+        str,
+        choices=[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+        ],
+    ),
+    names: discord.Option(
+        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
+    ),
 ) -> None:
     """Add items to a user in the status table."""
     database = DataBase()
-    await database.update_user_items(
-        user=ctx.author.id,
-        action="remove",
-        item_kind=kind,
-        item_names=names,
-    )
-    await ctx.respond(f"Removed mounts: {names}")
+    item_names = await database.list_item_names(kind)
+    items_dne = list(set(names.split(",")) - set(item_names))
+    if len(items_dne) != 0:
+        await ctx.respond(
+            f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+        )
+    else:
+        await database.update_user_items(
+            user=ctx.author.id,
+            action="remove",
+            item_kind=kind,
+            item_names=names,
+        )
+        await ctx.respond(f"Removed {expansion} mounts: {names}")
 
 
 def main() -> None:
