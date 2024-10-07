@@ -193,6 +193,7 @@ async def oview(
     )
     embed = discord.Embed(
         title=f"{expansion.capitalize()} mounts",
+        description=f"{kind.capitalize()}",
         color=discord.Colour.blurple(),
     )
     embed.add_field(
