@@ -195,14 +195,13 @@ async def oview(
         "a realm reborn": "https://lds-img.finalfantasyxiv.com/h/-/pnlEUJhVj0vMO7dtJ5psZ84Vvg.jpg",
         "heavensward": "https://lds-img.finalfantasyxiv.com/h/3/uN1BWnRvdTy5nT8izK6G4Hu3cI.jpg",
         "stormblood": "https://lds-img.finalfantasyxiv.com/h/v/CBMATiZFo0BaxDrY2G483WScs4.jpg",
-        "shadowbringers": "https://lds-img.finalfantasyxiv.com/h/I/Wu5E0qQJU5Yj6KlgyzbvvjrlPA.jpg",
+        "shadowbringers": "https://lds-img.finalfantasyxiv.com/h/m/B56bwbNBbqkA9UlbmcZ_BeWIL8.jpg",
         "endwalker": "https://lds-img.finalfantasyxiv.com/h/Q/YW-_Cq8HEN5QOH5PD5w9xF2-YI.jpg",
         "dawntrail": "https://lds-img.finalfantasyxiv.com/h/Z/1Li39bwJmXi701FfGzRL_7LAZg.jpg",
     }
     image_url = image_urls[expansion]
     embed = discord.Embed(
-        title=f"{expansion.capitalize()} mounts",
-        description=f"{kind.capitalize()}",
+        title=f"{expansion.capitalize()} {kind}",
         color=discord.Colour.blurple(),
     )
     embed.add_field(
@@ -216,6 +215,7 @@ async def oview(
         inline=True,
     )
     embed.set_image(url=image_url)
+    embed.set_thumbnail(url=ctx.author.avatar)
     await ctx.respond(embed=embed)
 
 
