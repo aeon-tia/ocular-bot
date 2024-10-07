@@ -638,8 +638,45 @@ class DataBase:
         if expansion_name is None:
             return table.select("item_name").to_series().to_list()
         return (
-                table.filter(pl.col("item_expac") == expansion_name)
-                .select("item_name")
-                .to_series()
-                .to_list()
+            table.filter(pl.col("item_expac") == expansion_name)
+            .select("item_name")
+            .to_series()
+            .to_list()
+        )
+
+    async def list_user_items(
+        self: Self,
+        user: int,
+        check_type: Literal["has", "needs"],
+        kind: Literal["trials", "raids"],
+        expansion: Literal[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+        ],
+    ) -> list[str]:
+        """Get list of mounts a user has or needs."""
+        user_id = await self.get_user_from_discord_id(user)
+        status_table = await self.read_table_polars("status")
+        item_table = await self.read_table_polars(kind)
+        check_val = 1 if check_type == "has" else 0
+        status_table = (
+            status_table.filter(
+                (pl.col("user_id") == user_id)
+                & (pl.col("item_kind") == kind)
+                & (pl.col("has_item") == check_val),
             )
+        ).select("item_id")
+        item_names =  (
+            status_table.join(item_table, on="item_id", how="inner")
+            .filter(pl.col("item_expac") == expansion)
+            .select("item_name")
+            .to_series()
+            .to_list()
+        )
+        if len(item_names) == 0:
+            return ["None"]
+        return item_names
