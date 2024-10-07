@@ -162,6 +162,52 @@ async def oremove(
         await ctx.respond(f"Removed {expansion} mounts: {names}")
 
 
+@bot.slash_command(name="oview", description="View your mounts.")
+async def oview(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    expansion: discord.Option(
+        str,
+        choices=[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+        ],
+    ),
+) -> None:
+    database = DataBase()
+    has_mounts = await database.list_user_items(
+        user=ctx.author.id,
+        check_type="has",
+        kind=kind,
+        expansion=expansion,
+    )
+    needs_mounts = await database.list_user_items(
+        user=ctx.author.id,
+        check_type="needs",
+        kind=kind,
+        expansion=expansion,
+    )
+    embed = discord.Embed(
+        title=f"{expansion.capitalize()} mounts",
+        color=discord.Colour.blurple(),
+    )
+    embed.add_field(
+        name="Have",
+        value=f" - {'\n - '.join(has_mounts)}",
+        inline=True,
+    )
+    embed.add_field(
+        name="Need",
+        value=f" - {'\n - '.join(needs_mounts)}",
+        inline=True,
+    )
+    await ctx.respond(embed=embed)
+
+
 def main() -> None:
     """Run program."""
     bot.run(os.getenv("TOKEN"))
