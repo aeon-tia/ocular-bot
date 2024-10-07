@@ -678,5 +678,5 @@ class DataBase:
             .to_list()
         )
         if len(item_names) == 0:
-            return ["None"]
+            return ["none"]
         return item_names
