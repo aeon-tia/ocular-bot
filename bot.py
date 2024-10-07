@@ -53,13 +53,13 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
         await ctx.send_response(
             content="I already have a user with this name in my database.",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
     elif id_exists:
         await ctx.send_response(
             content="I already have a user with your discord ID in my database.",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
     else:
         await database.append_new_user(name=name, discord_id=ctx.author.id)
@@ -67,7 +67,7 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
         await ctx.send_response(
             content=f"You have been added as {name} in the database.",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
 
 
@@ -98,7 +98,7 @@ async def omounts(
         description=f"Available mount names are: \n - {'\n - '.join(item_names)}",
         color=discord.Colour.blurple(),
     )
-    await ctx.send_response(embed=embed, ephemeral=True, delete_after=120)
+    await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
 
 
 @bot.slash_command(name="oadd", description="Add mounts to your list.")
@@ -128,7 +128,7 @@ async def oadd(
         await ctx.send_response(
             content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
     else:
         await database.update_user_items(
@@ -140,7 +140,7 @@ async def oadd(
         await ctx.send_response(
             content=f"Added {expansion} mounts: {names}",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
 
 
@@ -171,7 +171,7 @@ async def oremove(
         await ctx.send_response(
             content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
     else:
         await database.update_user_items(
@@ -183,7 +183,7 @@ async def oremove(
         await ctx.send_response(
             content=f"Removed {expansion} mounts: {names}",
             ephemeral=True,
-            delete_after=120,
+            delete_after=90,
         )
 
 
