@@ -310,19 +310,18 @@ class DataBase:
 
     async def check_user_exists(
         self: Self,
-        check_col: Literal["user_name", "user_id", "discord_id"],
+        check_col: Literal["user_name", "user_id", "user_discord_id"],
         check_val: str | int,
     ) -> bool:
         """Check if a user already exists in the users table."""
         table = await self.read_table_polars("users")
-        if table.shape[0] != 0:
-            table_empty = not (
-                table.filter(pl.col(check_col) == check_val)
-                .select("user_id")
-                .is_empty()
-            )
-            return not table_empty
-        return False
+        if table.shape[0] == 0:
+            return False
+        return not (
+            table.filter(pl.col(check_col) == check_val)
+            .select("user_id")
+            .is_empty()
+        )
 
     async def list_item_names(
         self: Self,

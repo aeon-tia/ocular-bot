@@ -46,16 +46,17 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
     )
     # Check if discord ID is already added
     id_exists = await database.check_user_exists(
-        check_col="discord_id",
+        check_col="user_discord_id",
         check_val=ctx.author.id,
     )
     if name_exists:
         await ctx.respond("I already have a user with this name in my database.")
-    if id_exists:
+    elif id_exists:
         await ctx.respond("I already have a user with your discord ID in my database.")
-    await database.append_new_user(name=name, discord_id=ctx.author.id)
-    await database.append_new_status(discord_id=ctx.author.id)
-    await ctx.respond(f"You have been added as {name} in the database.")
+    else:
+        await database.append_new_user(name=name, discord_id=ctx.author.id)
+        await database.append_new_status(discord_id=ctx.author.id)
+        await ctx.respond(f"You have been added as {name} in the database.")
 
 
 @bot.slash_command(name="omounts", description="List available mount names.")
