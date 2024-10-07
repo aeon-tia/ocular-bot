@@ -50,13 +50,25 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
         check_val=ctx.author.id,
     )
     if name_exists:
-        await ctx.respond("I already have a user with this name in my database.")
+        await ctx.send_response(
+            content="I already have a user with this name in my database.",
+            ephemeral=True,
+            delete_after=120,
+        )
     elif id_exists:
-        await ctx.respond("I already have a user with your discord ID in my database.")
+        await ctx.send_response(
+            content="I already have a user with your discord ID in my database.",
+            ephemeral=True,
+            delete_after=120,
+        )
     else:
         await database.append_new_user(name=name, discord_id=ctx.author.id)
         await database.append_new_status(discord_id=ctx.author.id)
-        await ctx.respond(f"You have been added as {name} in the database.")
+        await ctx.send_response(
+            content=f"You have been added as {name} in the database.",
+            ephemeral=True,
+            delete_after=120,
+        )
 
 
 @bot.slash_command(name="omounts", description="List available mount names.")
@@ -86,7 +98,7 @@ async def omounts(
         description=f"Available mount names are: \n - {'\n - '.join(item_names)}",
         color=discord.Colour.blurple(),
     )
-    await ctx.respond(embed=embed)
+    await ctx.send_response(embed=embed, ephemeral=True, delete_after=120)
 
 
 @bot.slash_command(name="oadd", description="Add mounts to your list.")
@@ -113,8 +125,10 @@ async def oadd(
     item_names = await database.list_item_names(kind)
     items_dne = list(set(names.split(",")) - set(item_names))
     if len(items_dne) != 0:
-        await ctx.respond(
-            f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+        await ctx.send_response(
+            content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+            ephemeral=True,
+            delete_after=120,
         )
     else:
         await database.update_user_items(
@@ -123,7 +137,11 @@ async def oadd(
             item_kind=kind,
             item_names=names,
         )
-        await ctx.respond(f"Added {expansion} mounts: {names}")
+        await ctx.send_response(
+            content=f"Added {expansion} mounts: {names}",
+            ephemeral=True,
+            delete_after=120,
+        )
 
 
 @bot.slash_command(name="oremove", description="Remove mounts from your list.")
@@ -150,8 +168,10 @@ async def oremove(
     item_names = await database.list_item_names(kind)
     items_dne = list(set(names.split(",")) - set(item_names))
     if len(items_dne) != 0:
-        await ctx.respond(
-            f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+        await ctx.send_response(
+            content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+            ephemeral=True,
+            delete_after=120,
         )
     else:
         await database.update_user_items(
@@ -160,7 +180,11 @@ async def oremove(
             item_kind=kind,
             item_names=names,
         )
-        await ctx.respond(f"Removed {expansion} mounts: {names}")
+        await ctx.send_response(
+            content=f"Removed {expansion} mounts: {names}",
+            ephemeral=True,
+            delete_after=120,
+        )
 
 
 @bot.slash_command(name="oview", description="View your mounts.")
