@@ -202,7 +202,7 @@ async def dbrenamemount(
         await database.edit_item_name(kind, from_name, to_name)
         logging.info("Generating message")
         await ctx.send_response(
-            content=f"Renamed `{expansion}` `{kind}` `{from_name}` to {to_name}.",
+            content=f"Renamed `{expansion}` `{kind}` `{from_name}` to `{to_name}`.",
             ephemeral=True,
             delete_after=90,
         )
@@ -244,7 +244,7 @@ async def addme(ctx: discord.ApplicationContext, name: str) -> None:
         await database.append_new_user(name=name, discord_id=ctx.author.id)
         await database.append_new_status(discord_id=ctx.author.id)
         await ctx.send_response(
-            content=f"You have been added as {name} in the database.",
+            content=f"You have been added as `{name}` in my database.",
             ephemeral=True,
             delete_after=90,
         )
@@ -308,11 +308,10 @@ async def addmount(
     logging.info("/addmount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
-    items_dne = list(set(name.split(",")) - set(item_names))
-    if len(items_dne) != 0:
+    if name not in item_names:
         logging.info("Items not added, invalid names provided")
         await ctx.send_response(
-            content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+            content=f"`{name}` isn't a valid mount name in my database.",
             ephemeral=True,
             delete_after=90,
         )
@@ -326,7 +325,7 @@ async def addmount(
         )
         logging.info("Items added")
         await ctx.send_response(
-            content=f"Added {expansion} mounts: {name}",
+            content=f"Added `{expansion}` mount `{name}`",
             ephemeral=True,
             delete_after=90,
         )
@@ -355,10 +354,9 @@ async def removemount(
     logging.info("/removemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
-    items_dne = list(set(name.split(",")) - set(item_names))
-    if len(items_dne) != 0:
+    if name not in item_names:
         await ctx.send_response(
-            content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
+            content=f"`{name}` isn't a valid mount name in my database.",
             ephemeral=True,
             delete_after=90,
         )
@@ -372,7 +370,7 @@ async def removemount(
         )
         logging.info("Items removed")
         await ctx.send_response(
-            content=f"Removed {expansion} mounts: {name}",
+            content=f"Removed `{expansion}` mount `{name}`",
             ephemeral=True,
             delete_after=90,
         )
