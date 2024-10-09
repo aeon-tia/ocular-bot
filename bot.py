@@ -43,7 +43,7 @@ async def on_ready() -> None:
     """Create DB and print status message when bot comes online."""
     database = DataBase()
     await database.init_tables()
-    logging.info("%s is ready!", bot.user)  # noqa: T201
+    logging.info("%s is ready!", bot.user)
 
 
 @bot.slash_command(name="ocular", description="Confirm the bot is responsive.")
@@ -59,11 +59,22 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
     description="(Admin only) Create a new mount in the database.",
 )
 @commands.is_owner()
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "name",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
 async def dbcreatemount(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(str),
-    name: discord.Option(str),
+    kind: str,
+    expansion: str,
+    name: str,
 ) -> None:
     """Create new mounts in the database."""
     logging.info("/dbcreatemount invoked by %s", ctx.author.name)
@@ -90,18 +101,26 @@ async def dbcreatemount(
 
 
 @bot.slash_command(
-    name="dbdeletemount", description="(Admin only) Delete a mount from the database.",
+    name="dbdeletemount",
+    description="(Admin only) Delete a mount from the database.",
 )
 @commands.is_owner()
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "name",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
 async def dbdeletemount(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
-    ),
-    name: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
-    ),
+    kind: str,
+    expansion: str,
+    name: str,
 ) -> None:
     """Delete a mount from the database."""
     logging.info("/dbdeletemount invoked by %s", ctx.author.name)
@@ -128,18 +147,27 @@ async def dbdeletemount(
 
 
 @bot.slash_command(
-    name="dbrenamemount", description="(Admin only) Rename a mount in the database.",
+    name="dbrenamemount",
+    description="(Admin only) Rename a mount in the database.",
 )
 @commands.is_owner()
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "from_name",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
+@discord.option("to_name", type=str)
 async def dbrenamemount(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
-    ),
-    from_name: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
-    ),
+    kind: str,
+    expansion: str,
+    from_name: str,
     to_name: str,
 ) -> None:
     """Edit the name of a mount in the database."""
@@ -166,7 +194,10 @@ async def dbrenamemount(
     else:
         logging.info(
             "Renaming %s %s mount from %s to %s",
-            expansion, kind, from_name, to_name,
+            expansion,
+            kind,
+            from_name,
+            to_name,
         )
         await database.edit_item_name(kind, from_name, to_name)
         logging.info("Generating message")
@@ -179,7 +210,8 @@ async def dbrenamemount(
 
 
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
-async def addme(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
+@discord.option("name", type=str)
+async def addme(ctx: discord.ApplicationContext, name: str) -> None:
     """Add user to the user table."""
     logging.info("/addme invoked by %s", ctx.author.name)
     database = DataBase()
@@ -225,12 +257,16 @@ async def addme(ctx: discord.ApplicationContext, name: discord.Option(str)) -> N
 
 
 @bot.slash_command(name="mountlist", description="List available mount names.")
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
 async def mountlist(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
-    ),
+    kind: str,
+    expansion: str,
 ) -> None:
     """Show a list of available mount names."""
     logging.info("/mountlist invoked by %s", ctx.author.name)
@@ -251,15 +287,22 @@ async def mountlist(
 
 
 @bot.slash_command(name="addmount", description="Add mounts to your list.")
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "names",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
 async def addmount(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
-    ),
-    names: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
-    ),
+    kind: str,
+    expansion: str,
+    names: str,
 ) -> None:
     """Add items to a user in the status table."""
     logging.info("/addmount invoked by %s", ctx.author.name)
@@ -291,15 +334,22 @@ async def addmount(
 
 
 @bot.slash_command(name="removemount", description="Remove mounts from your list.")
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "names",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
 async def removemount(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
-    ),
-    names: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
-    ),
+    kind: str,
+    expansion: str,
+    names: str,
 ) -> None:
     """Add items to a user in the status table."""
     logging.info("/removemount invoked by %s", ctx.author.name)
@@ -330,12 +380,16 @@ async def removemount(
 
 
 @bot.slash_command(name="mymounts", description="View your mounts.")
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
 async def mymounts(
     ctx: discord.ApplicationContext,
-    kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: discord.Option(
-        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
-    ),
+    kind: str,
+    expansion: str,
 ) -> None:
     """View list of held and needed mounts."""
     logging.info("/mymounts invoked by %s", ctx.author.name)
