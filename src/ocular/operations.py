@@ -347,7 +347,7 @@ class DataBase:
     ) -> list[str]:
         """Get list of expansions in a table."""
         table = await self.read_table_polars(kind)
-        return table.select("item_expac").to_series().to_list()
+        return table.select("item_expac").to_series().unique().to_list()
 
     async def list_user_items(
         self: Self,
