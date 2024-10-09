@@ -373,7 +373,10 @@ class DataBase:
         return item_names
 
     async def edit_item_name(
-        self: Self, item_kind: Literal["trials", "raids"], old_name: str, new_name: str,
+        self: Self,
+        item_kind: Literal["trials", "raids"],
+        old_name: str,
+        new_name: str,
     ) -> None:
         """Edit an item name."""
         item_id = await self.get_item_ids(item_kind, old_name)
@@ -398,11 +401,13 @@ class DataBase:
             await self.append_to_raid_table(new_row)
 
     async def delete_items(
-        self: Self, kind: Literal["trials", "raids"], name: str,
+        self: Self,
+        kind: Literal["trials", "raids"],
+        name: str,
     ) -> None:
         """Remove mounts from the database."""
         item_id = await self.get_item_ids(kind, name)
-        params = (item_id)
+        params = tuple(item_id)
         if kind == "trials":
             query = "DELETE FROM trials WHERE item_id = ?"
         if kind == "raids":
