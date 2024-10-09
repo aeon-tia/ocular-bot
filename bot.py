@@ -294,7 +294,7 @@ async def mountlist(
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
 )
 @discord.option(
-    "names",
+    "name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
 )
@@ -302,13 +302,13 @@ async def addmount(
     ctx: discord.ApplicationContext,
     kind: str,
     expansion: str,
-    names: str,
+    name: str,
 ) -> None:
     """Add items to a user in the status table."""
     logging.info("/addmount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
-    items_dne = list(set(names.split(",")) - set(item_names))
+    items_dne = list(set(name.split(",")) - set(item_names))
     if len(items_dne) != 0:
         logging.info("Items not added, invalid names provided")
         await ctx.send_response(
@@ -317,16 +317,16 @@ async def addmount(
             delete_after=90,
         )
     else:
-        logging.info("Adding items %s under user %s", names, ctx.author.name)
+        logging.info("Adding items %s under user %s", name, ctx.author.name)
         await database.update_user_items(
             action="add",
             user=ctx.author.id,
             item_kind=kind,
-            item_names=names,
+            item_names=name,
         )
         logging.info("Items added")
         await ctx.send_response(
-            content=f"Added {expansion} mounts: {names}",
+            content=f"Added {expansion} mounts: {name}",
             ephemeral=True,
             delete_after=90,
         )
@@ -341,7 +341,7 @@ async def addmount(
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
 )
 @discord.option(
-    "names",
+    "name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
 )
@@ -349,13 +349,13 @@ async def removemount(
     ctx: discord.ApplicationContext,
     kind: str,
     expansion: str,
-    names: str,
+    name: str,
 ) -> None:
     """Add items to a user in the status table."""
     logging.info("/removemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
-    items_dne = list(set(names.split(",")) - set(item_names))
+    items_dne = list(set(name.split(",")) - set(item_names))
     if len(items_dne) != 0:
         await ctx.send_response(
             content=f"`{", ".join(items_dne)}` are not valid mount names in my database.",
@@ -363,16 +363,16 @@ async def removemount(
             delete_after=90,
         )
     else:
-        logging.info("Removing items %s from user %s", names, ctx.author.name)
+        logging.info("Removing items %s from user %s", name, ctx.author.name)
         await database.update_user_items(
             user=ctx.author.id,
             action="remove",
             item_kind=kind,
-            item_names=names,
+            item_names=name,
         )
         logging.info("Items removed")
         await ctx.send_response(
-            content=f"Removed {expansion} mounts: {names}",
+            content=f"Removed {expansion} mounts: {name}",
             ephemeral=True,
             delete_after=90,
         )
