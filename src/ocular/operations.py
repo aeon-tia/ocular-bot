@@ -384,7 +384,6 @@ class DataBase:
         params = (new_name, item_id[0])
         await self.db_execute_qmark(query, params)
 
-
     async def add_new_items(
         self: Self,
         kind: Literal["trials", "raids"],
@@ -397,3 +396,15 @@ class DataBase:
             await self.append_to_trial_table(new_row)
         if kind == "raids":
             await self.append_to_raid_table(new_row)
+
+    async def delete_items(
+        self: Self, kind: Literal["trials", "raids"], name: str,
+    ) -> None:
+        """Remove mounts from the database."""
+        item_id = await self.get_item_ids(kind, name)
+        params = (item_id)
+        if kind == "trials":
+            query = "DELETE FROM trials WHERE item_id = ?"
+        if kind == "raids":
+            query = "DELETE FROM raids WHERE item_id = ?"
+        await self.db_execute_qmark(query, params)
