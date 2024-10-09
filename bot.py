@@ -53,7 +53,10 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
     await ctx.respond("We stand together!")
     logging.info("/ocular OK")
 
-@bot.slash_command(name="dbcreate", description="(Admin only) Create a new mount in the database.")
+
+@bot.slash_command(
+    name="dbcreate", description="(Admin only) Create a new mount in the database."
+)
 @commands.is_owner()
 async def dbcreate(
     ctx: discord.ApplicationContext,
@@ -84,7 +87,10 @@ async def dbcreate(
         )
     logging.info("/dbcreate OK")
 
-@bot.slash_command(name="dbdelete", description="(Admin only) Delete a mount from the database.")
+
+@bot.slash_command(
+    name="dbdelete", description="(Admin only) Delete a mount from the database."
+)
 @commands.is_owner()
 async def dbdelete(
     ctx: discord.ApplicationContext,
@@ -118,6 +124,7 @@ async def dbdelete(
             delete_after=90,
         )
     logging.info("/dbdelete OK")
+
 
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
 async def addme(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
