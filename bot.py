@@ -49,7 +49,7 @@ async def on_ready() -> None:
 @bot.slash_command(name="ocular", description="Confirm the bot is responsive.")
 async def ocular(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
-    logging.info("%s invoked /ocular", ctx.author.name)
+    logging.info("/ocular invoked by %s", ctx.author.name)
     await ctx.respond("We stand together!")
     logging.info("/ocular OK")
 
@@ -66,7 +66,7 @@ async def dbcreatemount(
     name: discord.Option(str),
 ) -> None:
     """Create new mounts in the database."""
-    logging.info("%s invoked /dbcreatemount", ctx.author.name)
+    logging.info("/dbcreatemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
     already_exists = len(item_id) != 0
@@ -104,7 +104,7 @@ async def dbdeletemount(
     ),
 ) -> None:
     """Delete a mount from the database."""
-    logging.info("%s invoked /dbdeletemount", ctx.author.name)
+    logging.info("/dbdeletemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
     no_match = len(item_id) == 0
@@ -143,7 +143,7 @@ async def dbrenamemount(
     to_name: str,
 ) -> None:
     """Edit the name of a mount in the database."""
-    logging.info("%s invoked /dbrenamemount", ctx.author.name)
+    logging.info("/dbrenamemount invoked by %s", ctx.author.name)
     database = DataBase()
     from_item_id = await database.get_item_ids(kind, from_name)
     to_item_id = await database.get_item_ids(kind, to_name)
@@ -181,7 +181,7 @@ async def dbrenamemount(
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
 async def addme(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
     """Add user to the user table."""
-    logging.info("%s invoked /addme", ctx.author.name)
+    logging.info("/addme invoked by %s", ctx.author.name)
     database = DataBase()
     # Check if user name is already added
     name_exists = await database.check_user_exists(
@@ -233,7 +233,7 @@ async def mountlist(
     ),
 ) -> None:
     """Show a list of available mount names."""
-    logging.info("%s invoked /mountlist", ctx.author.name)
+    logging.info("/mountlist invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(
         table_name=kind,
@@ -262,7 +262,7 @@ async def addmount(
     ),
 ) -> None:
     """Add items to a user in the status table."""
-    logging.info("%s invoked /addmount", ctx.author.name)
+    logging.info("/addmount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
     items_dne = list(set(names.split(",")) - set(item_names))
@@ -302,7 +302,7 @@ async def removemount(
     ),
 ) -> None:
     """Add items to a user in the status table."""
-    logging.info("%s invoked /removemount", ctx.author.name)
+    logging.info("/removemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
     items_dne = list(set(names.split(",")) - set(item_names))
@@ -338,7 +338,7 @@ async def mymounts(
     ),
 ) -> None:
     """View list of held and needed mounts."""
-    logging.info("%s invoked /mymounts", ctx.author.name)
+    logging.info("/mymounts invoked by %s", ctx.author.name)
     database = DataBase()
     has_mounts = await database.list_user_items(
         user=ctx.author.id,
