@@ -47,13 +47,13 @@ async def on_ready() -> None:
 
 
 @bot.slash_command(name="ocular", description="Confirm the bot is responsive.")
-async def oping(ctx: discord.ApplicationContext) -> None:
+async def ocular(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
     logging.info("%s invoked /ocular", ctx.author.name)
     await ctx.respond("We stand together!")
     logging.info("/ocular OK")
 
-@bot.slash_command(name="dbcreate", description="Create a new mount in the database.")
+@bot.slash_command(name="dbcreate", description="(Admin only) Create a new mount in the database.")
 @commands.is_owner()
 async def dbcreate(
     ctx: discord.ApplicationContext,
@@ -84,7 +84,7 @@ async def dbcreate(
         )
     logging.info("/dbcreate OK")
 
-@bot.slash_command(name="dbdelete", description="Delete a mount from the database.")
+@bot.slash_command(name="dbdelete", description="(Admin only) Delete a mount from the database.")
 @commands.is_owner()
 async def dbdelete(
     ctx: discord.ApplicationContext,
