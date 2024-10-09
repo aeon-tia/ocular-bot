@@ -318,9 +318,7 @@ class DataBase:
         if table.shape[0] == 0:
             return False
         return not (
-            table.filter(pl.col(check_col) == check_val)
-            .select("user_id")
-            .is_empty()
+            table.filter(pl.col(check_col) == check_val).select("user_id").is_empty()
         )
 
     async def list_item_names(
@@ -373,7 +371,7 @@ class DataBase:
                 & (pl.col("has_item") == check_val),
             )
         ).select("item_id")
-        item_names =  (
+        item_names = (
             status_table.join(item_table, on="item_id", how="inner")
             .filter(pl.col("item_expac") == expansion)
             .select("item_name")
