@@ -4,6 +4,7 @@ import logging
 import os
 
 import discord
+from discord.ext import commands
 from dotenv import load_dotenv
 
 from src.ocular.operations import DataBase
@@ -25,7 +26,7 @@ async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
     database = DataBase()
     mounts = await database.list_item_names(
         table_name=ctx.options["kind"],
-        expansion_name=ctx.options["expansion"],
+        expansion=ctx.options["expansion"],
     )
     return mounts  # noqa: RET504
 
@@ -45,6 +46,79 @@ async def oping(ctx: discord.ApplicationContext) -> None:
     await ctx.respond("I'm online!")
     logging.info("/oping OK")
 
+@bot.slash_command(name="dbcreate", description="Create a new mount in the database.")
+@commands.is_owner()
+async def dbcreate(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    expansion: str,
+    name: str,
+) -> None:
+    """Create new mounts in the database."""
+    logging.info("%s invoked /dbcreate", ctx.author.name)
+    database = DataBase()
+    item_id = await database.get_item_ids(kind, name)
+    already_exists = len(item_id) != 0
+    if already_exists:
+        logging.info("Stopping because matching mount name found")
+        await ctx.send_response(
+            content="I already have a mount with this name in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        logging.info("Adding new %s %s to database", expansion, name)
+        await database.add_new_item(kind, expansion, name)
+        logging.info("Generating message")
+        await ctx.send_response(
+            content=f"Created `{expansion}` `{kind}` mount `{name}`",
+            ephemeral=True,
+            delete_after=90,
+        )
+    logging.info("/dbcreate OK")
+
+@bot.slash_command(name="dbdelete", description="Delete a mount from the database.")
+@commands.is_owner()
+async def dbdelete(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    expansion: discord.Option(
+        str,
+        choices=[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+            "test",
+        ],
+    ),
+    name: discord.Option(
+        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
+    ),
+) -> None:
+    logging.info("%s invoked /dbdelete", ctx.author.name)
+    database = DataBase()
+    item_id = await database.get_item_ids(kind, name)
+    no_match = len(item_id) == 0
+    if no_match:
+        logging.info("Stopping because no matching mount name found")
+        await ctx.send_response(
+            content="I don't have a mount with this name in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        logging.info("Deleting %s %s mount %s", expansion, kind, name)
+        await database.delete_item(kind, name)
+        logging.info("Generating message")
+        await ctx.send_response(
+            content=f"Deleted `{expansion}` `{kind}` mount `{name}` from the database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    logging.info("/dbdelete OK")
 
 @bot.slash_command(name="oiam", description="Add yourself to the bot's user list.")
 async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
