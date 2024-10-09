@@ -55,17 +55,17 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
 
 
 @bot.slash_command(
-    name="dbcreate", description="(Admin only) Create a new mount in the database."
+    name="dbcreatemount", description="(Admin only) Create a new mount in the database."
 )
 @commands.is_owner()
-async def dbcreate(
+async def dbcreatemount(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(str),
     name: discord.Option(str),
 ) -> None:
     """Create new mounts in the database."""
-    logging.info("%s invoked /dbcreate", ctx.author.name)
+    logging.info("%s invoked /dbcreatemount", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
     already_exists = len(item_id) != 0
@@ -85,14 +85,14 @@ async def dbcreate(
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/dbcreate OK")
+    logging.info("/dbcreatemount OK")
 
 
 @bot.slash_command(
-    name="dbdelete", description="(Admin only) Delete a mount from the database."
+    name="dbdeletemount", description="(Admin only) Delete a mount from the database."
 )
 @commands.is_owner()
-async def dbdelete(
+async def dbdeletemount(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
@@ -103,7 +103,7 @@ async def dbdelete(
     ),
 ) -> None:
     """Delete a mount from the database."""
-    logging.info("%s invoked /dbdelete", ctx.author.name)
+    logging.info("%s invoked /dbdeletemount", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
     no_match = len(item_id) == 0
@@ -123,7 +123,7 @@ async def dbdelete(
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/dbdelete OK")
+    logging.info("/dbdeletemount OK")
 
 
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
