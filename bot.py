@@ -55,7 +55,8 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
 
 
 @bot.slash_command(
-    name="dbcreatemount", description="(Admin only) Create a new mount in the database."
+    name="dbcreatemount",
+    description="(Admin only) Create a new mount in the database.",
 )
 @commands.is_owner()
 async def dbcreatemount(
@@ -89,7 +90,7 @@ async def dbcreatemount(
 
 
 @bot.slash_command(
-    name="dbdeletemount", description="(Admin only) Delete a mount from the database."
+    name="dbdeletemount", description="(Admin only) Delete a mount from the database.",
 )
 @commands.is_owner()
 async def dbdeletemount(
@@ -124,6 +125,57 @@ async def dbdeletemount(
             delete_after=90,
         )
     logging.info("/dbdeletemount OK")
+
+
+@bot.slash_command(
+    name="dbrenamemount", description="(Admin only) Rename a mount in the database.",
+)
+@commands.is_owner()
+async def dbrenamemount(
+    ctx: discord.ApplicationContext,
+    kind: discord.Option(str, choices=["trials", "raids"]),
+    expansion: discord.Option(
+        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
+    ),
+    from_name: discord.Option(
+        str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
+    ),
+    to_name: str,
+) -> None:
+    """Edit the name of a mount in the database."""
+    logging.info("%s invoked /dbrenamemount", ctx.author.name)
+    database = DataBase()
+    from_item_id = await database.get_item_ids(kind, from_name)
+    to_item_id = await database.get_item_ids(kind, to_name)
+    no_from_name_found = len(from_item_id) == 0
+    to_name_found = len(to_item_id) != 0
+    if no_from_name_found:
+        logging.info("Stopping because mount name %s not found", from_name)
+        await ctx.send_response(
+            content=f"I don't have a mount named `{from_name}` in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    elif to_name_found:
+        logging.info("Stopping because mount name %s found", to_name)
+        await ctx.send_response(
+            content=f"I already have a mount named `{to_name}` in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        logging.info(
+            "Renaming %s %s mount from %s to %s",
+            expansion, kind, from_name, to_name,
+        )
+        await database.edit_item_name(kind, from_name, to_name)
+        logging.info("Generating message")
+        await ctx.send_response(
+            content=f"Renamed `{expansion}` `{kind}` `{from_name}` to {to_name}.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    logging.info("/dbrenamemount OK")
 
 
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
