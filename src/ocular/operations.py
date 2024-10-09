@@ -387,7 +387,7 @@ class DataBase:
         params = (new_name, item_id[0])
         await self.db_execute_qmark(query, params)
 
-    async def add_new_items(
+    async def add_new_item(
         self: Self,
         kind: Literal["trials", "raids"],
         expansion: str,
@@ -400,7 +400,7 @@ class DataBase:
         if kind == "raids":
             await self.append_to_raid_table(new_row)
 
-    async def delete_items(
+    async def delete_item(
         self: Self,
         kind: Literal["trials", "raids"],
         name: str,
