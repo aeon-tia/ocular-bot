@@ -31,6 +31,13 @@ async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
     return mounts  # noqa: RET504
 
 
+async def get_expansion_names(ctx: discord.AutocompleteContext) -> list[str]:
+    """Fetch list of mount names for autocomplete."""
+    database = DataBase()
+    expansions = await database.list_expansions(kind=ctx.options["kind"])
+    return expansions  # noqa: RET504
+
+
 @bot.event
 async def on_ready() -> None:
     """Create DB and print status message when bot comes online."""
@@ -51,8 +58,8 @@ async def oping(ctx: discord.ApplicationContext) -> None:
 async def dbcreate(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
-    expansion: str,
-    name: str,
+    expansion: discord.Option(str),
+    name: discord.Option(str),
 ) -> None:
     """Create new mounts in the database."""
     logging.info("%s invoked /dbcreate", ctx.author.name)
@@ -83,21 +90,13 @@ async def dbdelete(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
-        str,
-        choices=[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-            "test",
-        ],
+        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
     ),
     name: discord.Option(
         str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
     ),
 ) -> None:
+    """Delete a mount from the database."""
     logging.info("%s invoked /dbdelete", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
@@ -171,15 +170,7 @@ async def omounts(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
-        str,
-        choices=[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalkers",
-            "dawntrail",
-        ],
+        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
     ),
 ) -> None:
     """Show a list of available mount names."""
@@ -205,15 +196,7 @@ async def oadd(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
-        str,
-        choices=[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-        ],
+        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
     ),
     names: discord.Option(
         str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
@@ -253,15 +236,7 @@ async def oremove(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
-        str,
-        choices=[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-        ],
+        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
     ),
     names: discord.Option(
         str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
@@ -300,15 +275,7 @@ async def oview(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
-        str,
-        choices=[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-        ],
+        str, autocomplete=discord.utils.basic_autocomplete(get_expansion_names)
     ),
 ) -> None:
     """View list of held and needed mounts."""
