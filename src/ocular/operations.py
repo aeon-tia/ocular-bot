@@ -329,22 +329,14 @@ class DataBase:
     async def list_item_names(
         self: Self,
         table_name: Literal["trials", "raids"],
-        expansion_name: None
-        | Literal[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-        ] = None,
+        expansion: None | str = None,
     ) -> list[str]:
         """Get a list of item names from a DB table."""
         table = await self.read_table_polars(table_name)
-        if expansion_name is None:
+        if expansion is None:
             return table.select("item_name").to_series().to_list()
         return (
-            table.filter(pl.col("item_expac") == expansion_name)
+            table.filter(pl.col("item_expac") == expansion)
             .select("item_name")
             .to_series()
             .to_list()
@@ -355,14 +347,7 @@ class DataBase:
         user: int,
         check_type: Literal["has", "needs"],
         kind: Literal["trials", "raids"],
-        expansion: Literal[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-        ],
+        expansion: str,
     ) -> list[str]:
         """Get list of mounts a user has or needs."""
         user_id = await self.get_user_from_discord_id(user)
@@ -403,14 +388,7 @@ class DataBase:
     async def add_new_items(
         self: Self,
         kind: Literal["trials", "raids"],
-        expansion: Literal[
-            "a realm reborn",
-            "heavensward",
-            "stormblood",
-            "shadowbringers",
-            "endwalker",
-            "dawntrail",
-        ],
+        expansion: str,
         name: str,
     ) -> None:
         """Edit an item name."""
