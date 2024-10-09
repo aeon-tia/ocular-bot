@@ -273,7 +273,7 @@ async def mountlist(
     database = DataBase()
     item_names = await database.list_item_names(
         table_name=kind,
-        expansion_name=expansion,
+        expansion=expansion,
     )
     logging.info("Item lists generated")
     embed = discord.Embed(
