@@ -46,12 +46,12 @@ async def on_ready() -> None:
     logging.info("%s is ready!", bot.user)  # noqa: T201
 
 
-@bot.slash_command(name="oping", description="Confirm the bot is responsive.")
+@bot.slash_command(name="ocular", description="Confirm the bot is responsive.")
 async def oping(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
-    logging.info("%s invoked /oping", ctx.author.name)
-    await ctx.respond("I'm online!")
-    logging.info("/oping OK")
+    logging.info("%s invoked /ocular", ctx.author.name)
+    await ctx.respond("We stand together!")
+    logging.info("/ocular OK")
 
 @bot.slash_command(name="dbcreate", description="Create a new mount in the database.")
 @commands.is_owner()
@@ -119,10 +119,10 @@ async def dbdelete(
         )
     logging.info("/dbdelete OK")
 
-@bot.slash_command(name="oiam", description="Add yourself to the bot's user list.")
-async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
+@bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
+async def addme(ctx: discord.ApplicationContext, name: discord.Option(str)) -> None:
     """Add user to the user table."""
-    logging.info("%s invoked /oiam", ctx.author.name)
+    logging.info("%s invoked /addme", ctx.author.name)
     database = DataBase()
     # Check if user name is already added
     name_exists = await database.check_user_exists(
@@ -162,11 +162,11 @@ async def oiam(ctx: discord.ApplicationContext, name: discord.Option(str)) -> No
             name,
             ctx.author.id,
         )
-        logging.info("/oiam OK")
+    logging.info("/addme OK")
 
 
-@bot.slash_command(name="omounts", description="List available mount names.")
-async def omounts(
+@bot.slash_command(name="mountlist", description="List available mount names.")
+async def mountlist(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
@@ -174,7 +174,7 @@ async def omounts(
     ),
 ) -> None:
     """Show a list of available mount names."""
-    logging.info("%s invoked /omounts", ctx.author.name)
+    logging.info("%s invoked /mountlist", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(
         table_name=kind,
@@ -188,11 +188,11 @@ async def omounts(
     )
     logging.info("Message generated")
     await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
-    logging.info("/omounts OK")
+    logging.info("/mountlist OK")
 
 
-@bot.slash_command(name="oadd", description="Add mounts to your list.")
-async def oadd(
+@bot.slash_command(name="addmount", description="Add mounts to your list.")
+async def addmount(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
@@ -203,7 +203,7 @@ async def oadd(
     ),
 ) -> None:
     """Add items to a user in the status table."""
-    logging.info("%s invoked /oadd", ctx.author.name)
+    logging.info("%s invoked /addmount", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
     items_dne = list(set(names.split(",")) - set(item_names))
@@ -228,11 +228,11 @@ async def oadd(
             ephemeral=True,
             delete_after=90,
         )
-        logging.info("/oadd OK")
+    logging.info("/addmount OK")
 
 
-@bot.slash_command(name="oremove", description="Remove mounts from your list.")
-async def oremove(
+@bot.slash_command(name="removemount", description="Remove mounts from your list.")
+async def removemount(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
@@ -243,7 +243,7 @@ async def oremove(
     ),
 ) -> None:
     """Add items to a user in the status table."""
-    logging.info("%s invoked /oremove", ctx.author.name)
+    logging.info("%s invoked /removemount", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
     items_dne = list(set(names.split(",")) - set(item_names))
@@ -267,11 +267,11 @@ async def oremove(
             ephemeral=True,
             delete_after=90,
         )
-        logging.info("/oremove OK")
+    logging.info("/removemount OK")
 
 
-@bot.slash_command(name="oview", description="View your mounts.")
-async def oview(
+@bot.slash_command(name="mymounts", description="View your mounts.")
+async def mymounts(
     ctx: discord.ApplicationContext,
     kind: discord.Option(str, choices=["trials", "raids"]),
     expansion: discord.Option(
@@ -279,7 +279,7 @@ async def oview(
     ),
 ) -> None:
     """View list of held and needed mounts."""
-    logging.info("%s invoked /oview", ctx.author.name)
+    logging.info("%s invoked /mymounts", ctx.author.name)
     database = DataBase()
     has_mounts = await database.list_user_items(
         user=ctx.author.id,
@@ -321,7 +321,7 @@ async def oview(
     embed.set_thumbnail(url=ctx.author.avatar)
     logging.info("Message generated")
     await ctx.respond(embed=embed)
-    logging.info("/oview OK")
+    logging.info("/mymounts OK")
 
 
 def main() -> None:
