@@ -355,6 +355,7 @@ async def removemount(
     database = DataBase()
     item_names = await database.list_item_names(kind)
     if name not in item_names:
+        logging.info("Items not removed, invalid names provided")
         await ctx.send_response(
             content=f"`{name}` isn't a valid mount name in my database.",
             ephemeral=True,
