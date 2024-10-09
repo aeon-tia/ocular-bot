@@ -381,3 +381,15 @@ class DataBase:
         if len(item_names) == 0:
             return ["none"]
         return item_names
+
+    async def edit_item_name(
+        self: Self, item_kind: Literal["trials", "raids"], old_name: str, new_name: str,
+    ) -> None:
+        """Edit an item name."""
+        item_id = await self.get_item_ids(item_kind, old_name)
+        if item_kind == "trials":
+            query = "UPDATE trials SET item_name = ? WHERE item_id = ?"
+        if item_kind == "raids":
+            query = "UPDATE raids SET item_name = ? WHERE item_id = ?"
+        params = (new_name, item_id[0])
+        await self.db_execute_qmark(query, params)
