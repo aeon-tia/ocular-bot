@@ -413,3 +413,10 @@ class DataBase:
         if kind == "raids":
             query = "DELETE FROM raids WHERE item_id = ?"
         await self.db_execute_qmark(query, params)
+
+    async def delete_user(self: Self, name: str) -> None:
+        """Remove mounts from the database."""
+        user_id = await self.get_user_id(name)
+        params = (user_id,)
+        query = "DELETE FROM users WHERE user_id = ?"
+        await self.db_execute_qmark(query, params)
