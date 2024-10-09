@@ -118,6 +118,11 @@ class DataBase:
         new_id = uuid6.uuid7().hex
         return ({"user_name": name, "user_id": new_id, "user_discord_id": discord_id},)
 
+    def create_item_row(self: Self, name: str, expansion: str) -> tuple[dict]:
+        """Create a new item ID as a row for an item table."""
+        new_id = uuid6.uuid7().hex
+        return ({"item_id": new_id, "item_name": name, "item_expac": expansion},)
+
     async def append_new_user(self: Self, name: str, discord_id: int) -> None:
         """Create user table rows from a string of comma-separated user names."""
         row = self.create_user_row(name, discord_id)
@@ -393,3 +398,24 @@ class DataBase:
             query = "UPDATE raids SET item_name = ? WHERE item_id = ?"
         params = (new_name, item_id[0])
         await self.db_execute_qmark(query, params)
+
+
+    async def add_new_items(
+        self: Self,
+        kind: Literal["trials", "raids"],
+        expansion: Literal[
+            "a realm reborn",
+            "heavensward",
+            "stormblood",
+            "shadowbringers",
+            "endwalker",
+            "dawntrail",
+        ],
+        name: str,
+    ) -> None:
+        """Edit an item name."""
+        new_row = self.create_item_row(name, expansion)
+        if kind == "trials":
+            await self.append_to_trial_table(new_row)
+        if kind == "raids":
+            await self.append_to_raid_table(new_row)
