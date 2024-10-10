@@ -332,6 +332,63 @@ async def addmount(
     logging.info("/addmount OK")
 
 
+@bot.slash_command(name="adminaddmount", description="Add mounts to your list.")
+@commands.is_owner()
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "mount_name",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
+@discord.option("user_name", type=str)
+async def adminaddmount(
+    ctx: discord.ApplicationContext,
+    kind: str,
+    expansion: str,
+    mount_name: str,
+    user_name: str,
+) -> None:
+    """Add items to a user other than the author in the status table."""
+    logging.info("/adminaddmount invoked by %s", ctx.author.name)
+    database = DataBase()
+    user_did = await database.get_user_discord_id(user_name)
+    item_names = await database.list_item_names(kind)
+    if len(user_did) == 0:
+        logging.info("Items not added, invalid user name provided")
+        await ctx.send_response(
+            content=f"`{user_name}` isn't a valid user name in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    if mount_name not in item_names:
+        logging.info("Items not added, invalid mount name provided")
+        await ctx.send_response(
+            content=f"`{mount_name}` isn't a valid mount name in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        logging.info("Adding items %s for user %s", mount_name, user_name)
+        await database.update_user_items(
+            action="add",
+            user=user_did,
+            item_kind=kind,
+            item_names=mount_name,
+        )
+        logging.info("Items added")
+        await ctx.send_response(
+            content=f"Added `{expansion}` mount `{mount_name}` for `{user_name}`",
+            ephemeral=True,
+            delete_after=90,
+        )
+    logging.info("/adminaddmount OK")
+
+
 @bot.slash_command(name="removemount", description="Remove mounts from your list.")
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
@@ -376,6 +433,63 @@ async def removemount(
             delete_after=90,
         )
     logging.info("/removemount OK")
+
+
+@bot.slash_command(name="adminremovemount", description="Remove mounts from a user.")
+@commands.is_owner()
+@discord.option("kind", type=str, choices=["trials", "raids"])
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+@discord.option(
+    "mount_name",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+)
+@discord.option("user_name", type=str)
+async def adminremovemount(
+    ctx: discord.ApplicationContext,
+    kind: str,
+    expansion: str,
+    mount_name: str,
+    user_name: str,
+) -> None:
+    """Add items to a user other than the author in the status table."""
+    logging.info("/adminremovemount invoked by %s", ctx.author.name)
+    database = DataBase()
+    user_did = await database.get_user_discord_id(user_name)
+    item_names = await database.list_item_names(kind)
+    if len(user_did) == 0:
+        logging.info("Items not removed, invalid user name provided")
+        await ctx.send_response(
+            content=f"`{user_name}` isn't a valid user name in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    if mount_name not in item_names:
+        logging.info("Items not removed, invalid mount name provided")
+        await ctx.send_response(
+            content=f"`{mount_name}` isn't a valid mount name in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        logging.info("Removing items %s from user %s", mount_name, user_name)
+        await database.update_user_items(
+            action="remove",
+            user=user_did,
+            item_kind=kind,
+            item_names=mount_name,
+        )
+        logging.info("Items removed")
+        await ctx.send_response(
+            content=f"Removed `{expansion}` mount `{mount_name}` from `{user_name}`",
+            ephemeral=True,
+            delete_after=90,
+        )
+    logging.info("/adminremovemount OK")
 
 
 @bot.slash_command(name="mymounts", description="View your mounts.")
