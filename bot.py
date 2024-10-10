@@ -209,6 +209,56 @@ async def dbrenamemount(
     logging.info("/dbrenamemount OK")
 
 
+@bot.slash_command(
+    name="dbrenameuser",
+    description="(Admin only) Change the name of a user in the database.",
+)
+@commands.is_owner()
+async def dbrenameuser(
+    ctx: discord.ApplicationContext,
+    from_name: str,
+    to_name: str,
+) -> None:
+    """Change the name of a user in the database."""
+    logging.info("/dbrenameuser invoked by %s", ctx.author.name)
+    database = DataBase()
+    from_name_not_found = await database.check_user_exists(
+        check_col="user_name",
+        check_val=from_name,
+    )
+    to_name_exists = await database.check_user_exists(
+        check_col="user_name",
+        check_val=to_name,
+    )
+    if from_name_not_found:
+        logging.info("Username not changed because user %s not found", from_name)
+        await ctx.send_response(
+            content=f"I don't have a user named `{from_name}` in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    elif to_name_exists:
+        logging.info("Username not changed because user %s already exists", to_name)
+        await ctx.send_response(
+            content=f"I already have a user named `{to_name}` in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        logging.info("Changing user name %s to %s", from_name, to_name)
+        user_id = await database.get_user_id(from_name)
+        query = "UPDATE users SET user_name = ? WHERE user_id = ?"
+        params = (to_name, user_id)
+        await database.db_execute_qmark(query, params)
+        logging.info("Generating message")
+        await ctx.send_response(
+            content=f"User name `{from_name}` changed to `{to_name}`.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    logging.info("/dbrenameuser OK")
+
+
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
 @discord.option("name", type=str)
 async def addme(ctx: discord.ApplicationContext, name: str) -> None:
@@ -457,7 +507,8 @@ async def removemount(
 
 
 @bot.slash_command(
-    name="adminremovemount", description="(Admin only) Remove mounts from a user.",
+    name="adminremovemount",
+    description="(Admin only) Remove mounts from a user.",
 )
 @commands.is_owner()
 @discord.option("kind", type=str, choices=["trials", "raids"])
