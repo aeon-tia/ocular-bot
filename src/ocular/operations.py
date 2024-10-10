@@ -186,6 +186,16 @@ class DataBase:
             user_row = await cs.fetchone()
             return user_row["user_id"]
 
+    async def get_user_discord_id(self: Self, user_name: str) -> int:
+        """Get a user discord ID from user name."""
+        user_table = await self.read_table_polars("users")
+        return (
+            user_table.filter(pl.col("user_name") == user_name)
+            .select("user_discord_id")
+            .to_series()
+            .to_list()
+        )
+
     async def get_user_from_discord_id(self: Self, discord_id: str) -> str:
         """Get a user id from the user table.
 
@@ -343,7 +353,8 @@ class DataBase:
         )
 
     async def list_expansions(
-        self: Self, kind: Literal["trials", "raids"],
+        self: Self,
+        kind: Literal["trials", "raids"],
     ) -> list[str]:
         """Get list of expansions in a table."""
         table = await self.read_table_polars(kind)
