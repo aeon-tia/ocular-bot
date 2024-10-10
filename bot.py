@@ -350,7 +350,10 @@ async def addmount(
     logging.info("/addmount OK")
 
 
-@bot.slash_command(name="adminaddmount", description="Add mounts to your list.")
+@bot.slash_command(
+    name="adminaddmount",
+    description="(Admin only) Add mounts for a user.",
+)
 @commands.is_owner()
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
@@ -453,7 +456,9 @@ async def removemount(
     logging.info("/removemount OK")
 
 
-@bot.slash_command(name="adminremovemount", description="Remove mounts from a user.")
+@bot.slash_command(
+    name="adminremovemount", description="(Admin only) Remove mounts from a user.",
+)
 @commands.is_owner()
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
