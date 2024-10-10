@@ -2,6 +2,7 @@
 
 import logging
 import os
+from logging.handlers import RotatingFileHandler
 
 import discord
 from discord.ext import commands
@@ -9,13 +10,18 @@ from dotenv import load_dotenv
 
 from src.ocular.operations import DataBase
 
-logging.basicConfig(
-    filename="bot.log",
-    encoding="utf-8",
-    level=logging.INFO,
-    style="{",
-    format="{asctime} | {levelname:^8s} | {message}",
+log_formatter = logging.Formatter(
+    "{asctime} {levelname} {funcName}:{lineno} {message}", style="{",
 )
+log_handler = RotatingFileHandler(
+    filename="bot.log",
+    maxBytes=5 * 1024 * 1024,
+    backupCount=2,
+)
+log_handler.setFormatter(log_formatter)
+bot_log = logging.getLogger()
+bot_log.setLevel(logging.INFO)
+bot_log.addHandler(log_handler)
 
 load_dotenv()
 bot = discord.Bot()
@@ -43,15 +49,15 @@ async def on_ready() -> None:
     """Create DB and print status message when bot comes online."""
     database = DataBase()
     await database.init_tables()
-    logging.info("%s is ready!", bot.user)
+    bot_log.info("%s is ready!", bot.user)
 
 
 @bot.slash_command(name="ocular", description="Confirm the bot is responsive.")
 async def ocular(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
-    logging.info("/ocular invoked by %s", ctx.author.name)
+    bot_log.info("/ocular invoked by %s", ctx.author.name)
     await ctx.respond("We stand together!")
-    logging.info("/ocular OK")
+    bot_log.info("/ocular OK")
 
 
 @bot.slash_command(
@@ -77,27 +83,27 @@ async def dbcreatemount(
     name: str,
 ) -> None:
     """Create new mounts in the database."""
-    logging.info("/dbcreatemount invoked by %s", ctx.author.name)
+    bot_log.info("/dbcreatemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
     already_exists = len(item_id) != 0
     if already_exists:
-        logging.info("Stopping because matching mount name found")
+        bot_log.info("Stopping because matching mount name found")
         await ctx.send_response(
             content="I already have a mount with this name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Adding new %s %s to database", expansion, name)
+        bot_log.info("Adding new %s %s to database", expansion, name)
         await database.add_new_item(kind, expansion, name)
-        logging.info("Generating message")
+        bot_log.info("Generating message")
         await ctx.send_response(
             content=f"Created `{expansion}` `{kind}` mount `{name}`",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/dbcreatemount OK")
+    bot_log.info("/dbcreatemount OK")
 
 
 @bot.slash_command(
@@ -123,27 +129,27 @@ async def dbdeletemount(
     name: str,
 ) -> None:
     """Delete a mount from the database."""
-    logging.info("/dbdeletemount invoked by %s", ctx.author.name)
+    bot_log.info("/dbdeletemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_id = await database.get_item_ids(kind, name)
     no_match = len(item_id) == 0
     if no_match:
-        logging.info("Stopping because no matching mount name found")
+        bot_log.info("Stopping because no matching mount name found")
         await ctx.send_response(
             content="I don't have a mount with this name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Deleting %s %s mount %s", expansion, kind, name)
+        bot_log.info("Deleting %s %s mount %s", expansion, kind, name)
         await database.delete_item(kind, name)
-        logging.info("Generating message")
+        bot_log.info("Generating message")
         await ctx.send_response(
             content=f"Deleted `{expansion}` `{kind}` mount `{name}` from the database.",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/dbdeletemount OK")
+    bot_log.info("/dbdeletemount OK")
 
 
 @bot.slash_command(
@@ -171,28 +177,28 @@ async def dbrenamemount(
     to_name: str,
 ) -> None:
     """Edit the name of a mount in the database."""
-    logging.info("/dbrenamemount invoked by %s", ctx.author.name)
+    bot_log.info("/dbrenamemount invoked by %s", ctx.author.name)
     database = DataBase()
     from_item_id = await database.get_item_ids(kind, from_name)
     to_item_id = await database.get_item_ids(kind, to_name)
     no_from_name_found = len(from_item_id) == 0
     to_name_found = len(to_item_id) != 0
     if no_from_name_found:
-        logging.info("Stopping because mount name %s not found", from_name)
+        bot_log.info("Stopping because mount name %s not found", from_name)
         await ctx.send_response(
             content=f"I don't have a mount named `{from_name}` in my database.",
             ephemeral=True,
             delete_after=90,
         )
     elif to_name_found:
-        logging.info("Stopping because mount name %s found", to_name)
+        bot_log.info("Stopping because mount name %s found", to_name)
         await ctx.send_response(
             content=f"I already have a mount named `{to_name}` in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info(
+        bot_log.info(
             "Renaming %s %s mount from %s to %s",
             expansion,
             kind,
@@ -200,13 +206,13 @@ async def dbrenamemount(
             to_name,
         )
         await database.edit_item_name(kind, from_name, to_name)
-        logging.info("Generating message")
+        bot_log.info("Generating message")
         await ctx.send_response(
             content=f"Renamed `{expansion}` `{kind}` `{from_name}` to `{to_name}`.",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/dbrenamemount OK")
+    bot_log.info("/dbrenamemount OK")
 
 
 @bot.slash_command(
@@ -220,9 +226,9 @@ async def dbrenameuser(
     to_name: str,
 ) -> None:
     """Change the name of a user in the database."""
-    logging.info("/dbrenameuser invoked by %s", ctx.author.name)
+    bot_log.info("/dbrenameuser invoked by %s", ctx.author.name)
     database = DataBase()
-    from_name_not_found = await database.check_user_exists(
+    from_name_exists = await database.check_user_exists(
         check_col="user_name",
         check_val=from_name,
     )
@@ -230,40 +236,40 @@ async def dbrenameuser(
         check_col="user_name",
         check_val=to_name,
     )
-    if from_name_not_found:
-        logging.info("Username not changed because user %s not found", from_name)
+    if not from_name_exists:
+        bot_log.info("Username not changed because user %s not found", from_name)
         await ctx.send_response(
             content=f"I don't have a user named `{from_name}` in my database.",
             ephemeral=True,
             delete_after=90,
         )
     elif to_name_exists:
-        logging.info("Username not changed because user %s already exists", to_name)
+        bot_log.info("Username not changed because user %s already exists", to_name)
         await ctx.send_response(
             content=f"I already have a user named `{to_name}` in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Changing user name %s to %s", from_name, to_name)
+        bot_log.info("Changing user name %s to %s", from_name, to_name)
         user_id = await database.get_user_id(from_name)
         query = "UPDATE users SET user_name = ? WHERE user_id = ?"
         params = (to_name, user_id)
         await database.db_execute_qmark(query, params)
-        logging.info("Generating message")
+        bot_log.info("Generating message")
         await ctx.send_response(
             content=f"User name `{from_name}` changed to `{to_name}`.",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/dbrenameuser OK")
+    bot_log.info("/dbrenameuser OK")
 
 
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
 @discord.option("name", type=str)
 async def addme(ctx: discord.ApplicationContext, name: str) -> None:
     """Add user to the user table."""
-    logging.info("/addme invoked by %s", ctx.author.name)
+    bot_log.info("/addme invoked by %s", ctx.author.name)
     database = DataBase()
     # Check if user name is already added
     name_exists = await database.check_user_exists(
@@ -276,21 +282,21 @@ async def addme(ctx: discord.ApplicationContext, name: str) -> None:
         check_val=ctx.author.id,
     )
     if name_exists:
-        logging.info("Username %s not added because already exists", name)
+        bot_log.info("Username %s not added because already exists", name)
         await ctx.send_response(
             content="I already have a user with this name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     elif id_exists:
-        logging.info("Discord ID %s not added because already exists", ctx.author.id)
+        bot_log.info("Discord ID %s not added because already exists", ctx.author.id)
         await ctx.send_response(
             content="I already have a user with your discord ID in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Creating new user")
+        bot_log.info("Creating new user")
         await database.append_new_user(name=name, discord_id=ctx.author.id)
         await database.append_new_status(discord_id=ctx.author.id)
         await ctx.send_response(
@@ -298,30 +304,30 @@ async def addme(ctx: discord.ApplicationContext, name: str) -> None:
             ephemeral=True,
             delete_after=90,
         )
-        logging.info(
+        bot_log.info(
             "User entry created for %s with discord ID %s",
             name,
             ctx.author.id,
         )
-    logging.info("/addme OK")
+    bot_log.info("/addme OK")
 
 
 @bot.slash_command(name="userlist", description="List users in the database.")
 async def userlist(ctx: discord.ApplicationContext) -> None:
     """Get the list of all users in the database."""
-    logging.info("/userlist invoked by %s", ctx.author.name)
+    bot_log.info("/userlist invoked by %s", ctx.author.name)
     database = DataBase()
     user_table = await database.read_table_polars("users")
     user_list = user_table.select("user_name").to_series().to_list()
-    logging.info("Item lists generated")
+    bot_log.info("Item lists generated")
     embed = discord.Embed(
         title="Users",
         description=f"List of users in the database: \n - {'\n - '.join(user_list)}",
         color=discord.Colour.blurple(),
     )
-    logging.info("Message generated")
+    bot_log.info("Message generated")
     await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
-    logging.info("/userlist OK")
+    bot_log.info("/userlist OK")
 
 
 @bot.slash_command(name="mountlist", description="List available mount names.")
@@ -337,21 +343,21 @@ async def mountlist(
     expansion: str,
 ) -> None:
     """Show a list of available mount names."""
-    logging.info("/mountlist invoked by %s", ctx.author.name)
+    bot_log.info("/mountlist invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(
         table_name=kind,
         expansion=expansion,
     )
-    logging.info("Item lists generated")
+    bot_log.info("Item lists generated")
     embed = discord.Embed(
         title=f"{expansion.capitalize()} {kind} mounts",
         description=f"Available mount names are: \n - {'\n - '.join(item_names)}",
         color=discord.Colour.blurple(),
     )
-    logging.info("Message generated")
+    bot_log.info("Message generated")
     await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
-    logging.info("/mountlist OK")
+    bot_log.info("/mountlist OK")
 
 
 @bot.slash_command(name="addmount", description="Add mounts to your list.")
@@ -373,31 +379,31 @@ async def addmount(
     name: str,
 ) -> None:
     """Add items to a user in the status table."""
-    logging.info("/addmount invoked by %s", ctx.author.name)
+    bot_log.info("/addmount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
     if name not in item_names:
-        logging.info("Items not added, invalid names provided")
+        bot_log.info("Items not added, invalid names provided")
         await ctx.send_response(
             content=f"`{name}` isn't a valid mount name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Adding items %s under user %s", name, ctx.author.name)
+        bot_log.info("Adding items %s under user %s", name, ctx.author.name)
         await database.update_user_items(
             action="add",
             user=ctx.author.id,
             item_kind=kind,
             item_names=name,
         )
-        logging.info("Items added")
+        bot_log.info("Items added")
         await ctx.send_response(
             content=f"Added `{expansion}` mount `{name}`",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/addmount OK")
+    bot_log.info("/addmount OK")
 
 
 @bot.slash_command(
@@ -425,39 +431,39 @@ async def adminaddmount(
     user_name: str,
 ) -> None:
     """Add items to a user other than the author in the status table."""
-    logging.info("/adminaddmount invoked by %s", ctx.author.name)
+    bot_log.info("/adminaddmount invoked by %s", ctx.author.name)
     database = DataBase()
     user_did = await database.get_user_discord_id(user_name)
     item_names = await database.list_item_names(kind)
     if len(user_did) == 0:
-        logging.info("Items not added, invalid user name provided")
+        bot_log.info("Items not added, invalid user name provided")
         await ctx.send_response(
             content=f"`{user_name}` isn't a valid user name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     if mount_name not in item_names:
-        logging.info("Items not added, invalid mount name provided")
+        bot_log.info("Items not added, invalid mount name provided")
         await ctx.send_response(
             content=f"`{mount_name}` isn't a valid mount name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Adding items %s for user %s", mount_name, user_name)
+        bot_log.info("Adding items %s for user %s", mount_name, user_name)
         await database.update_user_items(
             action="add",
             user=user_did[0],
             item_kind=kind,
             item_names=mount_name,
         )
-        logging.info("Items added")
+        bot_log.info("Items added")
         await ctx.send_response(
             content=f"Added `{expansion}` mount `{mount_name}` for `{user_name}`",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/adminaddmount OK")
+    bot_log.info("/adminaddmount OK")
 
 
 @bot.slash_command(name="removemount", description="Remove mounts from your list.")
@@ -479,31 +485,31 @@ async def removemount(
     name: str,
 ) -> None:
     """Add items to a user in the status table."""
-    logging.info("/removemount invoked by %s", ctx.author.name)
+    bot_log.info("/removemount invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(kind)
     if name not in item_names:
-        logging.info("Items not removed, invalid names provided")
+        bot_log.info("Items not removed, invalid names provided")
         await ctx.send_response(
             content=f"`{name}` isn't a valid mount name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Removing items %s from user %s", name, ctx.author.name)
+        bot_log.info("Removing items %s from user %s", name, ctx.author.name)
         await database.update_user_items(
             user=ctx.author.id,
             action="remove",
             item_kind=kind,
             item_names=name,
         )
-        logging.info("Items removed")
+        bot_log.info("Items removed")
         await ctx.send_response(
             content=f"Removed `{expansion}` mount `{name}`",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/removemount OK")
+    bot_log.info("/removemount OK")
 
 
 @bot.slash_command(
@@ -531,39 +537,39 @@ async def adminremovemount(
     user_name: str,
 ) -> None:
     """Add items to a user other than the author in the status table."""
-    logging.info("/adminremovemount invoked by %s", ctx.author.name)
+    bot_log.info("/adminremovemount invoked by %s", ctx.author.name)
     database = DataBase()
     user_did = await database.get_user_discord_id(user_name)
     item_names = await database.list_item_names(kind)
     if len(user_did) == 0:
-        logging.info("Items not removed, invalid user name provided")
+        bot_log.info("Items not removed, invalid user name provided")
         await ctx.send_response(
             content=f"`{user_name}` isn't a valid user name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     if mount_name not in item_names:
-        logging.info("Items not removed, invalid mount name provided")
+        bot_log.info("Items not removed, invalid mount name provided")
         await ctx.send_response(
             content=f"`{mount_name}` isn't a valid mount name in my database.",
             ephemeral=True,
             delete_after=90,
         )
     else:
-        logging.info("Removing items %s from user %s", mount_name, user_name)
+        bot_log.info("Removing items %s from user %s", mount_name, user_name)
         await database.update_user_items(
             action="remove",
             user=user_did[0],
             item_kind=kind,
             item_names=mount_name,
         )
-        logging.info("Items removed")
+        bot_log.info("Items removed")
         await ctx.send_response(
             content=f"Removed `{expansion}` mount `{mount_name}` from `{user_name}`",
             ephemeral=True,
             delete_after=90,
         )
-    logging.info("/adminremovemount OK")
+    bot_log.info("/adminremovemount OK")
 
 
 @bot.slash_command(name="mymounts", description="View your mounts.")
@@ -579,7 +585,7 @@ async def mymounts(
     expansion: str,
 ) -> None:
     """View list of held and needed mounts."""
-    logging.info("/mymounts invoked by %s", ctx.author.name)
+    bot_log.info("/mymounts invoked by %s", ctx.author.name)
     database = DataBase()
     has_mounts = await database.list_user_items(
         user=ctx.author.id,
@@ -593,7 +599,7 @@ async def mymounts(
         kind=kind,
         expansion=expansion,
     )
-    logging.info("Item lists generated")
+    bot_log.info("Item lists generated")
     image_urls = {
         "a realm reborn": "https://lds-img.finalfantasyxiv.com/h/-/pnlEUJhVj0vMO7dtJ5psZ84Vvg.jpg",
         "heavensward": "https://lds-img.finalfantasyxiv.com/h/3/uN1BWnRvdTy5nT8izK6G4Hu3cI.jpg",
@@ -619,14 +625,14 @@ async def mymounts(
     )
     embed.set_image(url=image_url)
     embed.set_thumbnail(url=ctx.author.avatar)
-    logging.info("Message generated")
+    bot_log.info("Message generated")
     await ctx.respond(embed=embed)
-    logging.info("/mymounts OK")
+    bot_log.info("/mymounts OK")
 
 
 def main() -> None:
     """Run program."""
-    logging.info("Launching Ocular")
+    bot_log.info("Launching Ocular")
     bot.run(os.getenv("TOKEN"))
 
 
