@@ -256,6 +256,24 @@ async def addme(ctx: discord.ApplicationContext, name: str) -> None:
     logging.info("/addme OK")
 
 
+@bot.slash_command(name="userlist", description="List users in the database.")
+async def userlist(ctx: discord.ApplicationContext) -> None:
+    """Get the list of all users in the database."""
+    logging.info("/userlist invoked by %s", ctx.author.name)
+    database = DataBase()
+    user_table = await database.read_table_polars("users")
+    user_list = user_table.select("user_name").to_series().to_list()
+    logging.info("Item lists generated")
+    embed = discord.Embed(
+        title="Users",
+        description=f"List of users in the database: \n - {'\n - '.join(user_list)}",
+        color=discord.Colour.blurple(),
+    )
+    logging.info("Message generated")
+    await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
+    logging.info("/userlist OK")
+
+
 @bot.slash_command(name="mountlist", description="List available mount names.")
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
@@ -376,7 +394,7 @@ async def adminaddmount(
         logging.info("Adding items %s for user %s", mount_name, user_name)
         await database.update_user_items(
             action="add",
-            user=user_did,
+            user=user_did[0],
             item_kind=kind,
             item_names=mount_name,
         )
@@ -479,7 +497,7 @@ async def adminremovemount(
         logging.info("Removing items %s from user %s", mount_name, user_name)
         await database.update_user_items(
             action="remove",
-            user=user_did,
+            user=user_did[0],
             item_kind=kind,
             item_names=mount_name,
         )
