@@ -31,16 +31,15 @@ async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
     """Fetch list of mount names for autocomplete."""
     database = DataBase()
     mounts = await database.list_item_names(
-        table_name=ctx.options["kind"],
         expansion=ctx.options["expansion"],
     )
     return mounts  # noqa: RET504
 
 
-async def get_expansion_names(ctx: discord.AutocompleteContext) -> list[str]:
+async def get_expansion_names() -> list[str]:
     """Fetch list of mount names for autocomplete."""
     database = DataBase()
-    expansions = await database.list_expansions(kind=ctx.options["kind"])
+    expansions = await database.list_expansions()
     return expansions  # noqa: RET504
 
 
@@ -65,7 +64,6 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
     description="(Admin only) Create a new mount in the database.",
 )
 @commands.has_role(547835267394830348)
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -78,14 +76,13 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
 )
 async def dbcreatemount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     name: str,
 ) -> None:
     """Create new mounts in the database."""
     bot_log.info("/dbcreatemount invoked by %s", ctx.author.name)
     database = DataBase()
-    item_id = await database.get_item_ids(kind, name)
+    item_id = await database.get_item_ids(name)
     already_exists = len(item_id) != 0
     if already_exists:
         bot_log.info("Stopping because matching mount name found")
@@ -96,10 +93,10 @@ async def dbcreatemount(
         )
     else:
         bot_log.info("Adding new %s %s to database", expansion, name)
-        await database.add_new_item(kind, expansion, name)
+        await database.add_new_item(expansion, name)
         bot_log.info("Generating message")
         await ctx.send_response(
-            content=f"Created `{expansion}` `{kind}` mount `{name}`",
+            content=f"Created `{expansion}` mount `{name}`",
             ephemeral=True,
             delete_after=90,
         )
@@ -111,7 +108,6 @@ async def dbcreatemount(
     description="(Admin only) Delete a mount from the database.",
 )
 @commands.has_role(547835267394830348)
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -124,14 +120,13 @@ async def dbcreatemount(
 )
 async def dbdeletemount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     name: str,
 ) -> None:
     """Delete a mount from the database."""
     bot_log.info("/dbdeletemount invoked by %s", ctx.author.name)
     database = DataBase()
-    item_id = await database.get_item_ids(kind, name)
+    item_id = await database.get_item_ids(name)
     no_match = len(item_id) == 0
     if no_match:
         bot_log.info("Stopping because no matching mount name found")
@@ -141,11 +136,11 @@ async def dbdeletemount(
             delete_after=90,
         )
     else:
-        bot_log.info("Deleting %s %s mount %s", expansion, kind, name)
-        await database.delete_item(kind, name)
+        bot_log.info("Deleting %s %s mount %s", expansion, name)
+        await database.delete_item(name)
         bot_log.info("Generating message")
         await ctx.send_response(
-            content=f"Deleted `{expansion}` `{kind}` mount `{name}` from the database.",
+            content=f"Deleted `{expansion}` mount `{name}` from the database.",
             ephemeral=True,
             delete_after=90,
         )
@@ -157,7 +152,6 @@ async def dbdeletemount(
     description="(Admin only) Rename a mount in the database.",
 )
 @commands.has_role(547835267394830348)
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -171,7 +165,6 @@ async def dbdeletemount(
 @discord.option("to_name", type=str)
 async def dbrenamemount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     from_name: str,
     to_name: str,
@@ -179,8 +172,8 @@ async def dbrenamemount(
     """Edit the name of a mount in the database."""
     bot_log.info("/dbrenamemount invoked by %s", ctx.author.name)
     database = DataBase()
-    from_item_id = await database.get_item_ids(kind, from_name)
-    to_item_id = await database.get_item_ids(kind, to_name)
+    from_item_id = await database.get_item_ids(from_name)
+    to_item_id = await database.get_item_ids(to_name)
     no_from_name_found = len(from_item_id) == 0
     to_name_found = len(to_item_id) != 0
     if no_from_name_found:
@@ -199,16 +192,12 @@ async def dbrenamemount(
         )
     else:
         bot_log.info(
-            "Renaming %s %s mount from %s to %s",
-            expansion,
-            kind,
-            from_name,
-            to_name,
+            "Renaming %s %s mount from %s to %s", expansion, from_name, to_name,
         )
-        await database.edit_item_name(kind, from_name, to_name)
+        await database.edit_item_name("mounts", from_name, to_name)
         bot_log.info("Generating message")
         await ctx.send_response(
-            content=f"Renamed `{expansion}` `{kind}` `{from_name}` to `{to_name}`.",
+            content=f"Renamed `{expansion}` mount `{from_name}` to `{to_name}`.",
             ephemeral=True,
             delete_after=90,
         )
@@ -331,7 +320,6 @@ async def userlist(ctx: discord.ApplicationContext) -> None:
 
 
 @bot.slash_command(name="mountlist", description="List available mount names.")
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -339,19 +327,18 @@ async def userlist(ctx: discord.ApplicationContext) -> None:
 )
 async def mountlist(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
 ) -> None:
     """Show a list of available mount names."""
     bot_log.info("/mountlist invoked by %s", ctx.author.name)
     database = DataBase()
     item_names = await database.list_item_names(
-        table_name=kind,
+        table_name="mounts",
         expansion=expansion,
     )
     bot_log.info("Item lists generated")
     embed = discord.Embed(
-        title=f"{expansion.capitalize()} {kind} mounts",
+        title=f"{expansion.capitalize()} mounts",
         description=f"Available mount names are: \n - {'\n - '.join(item_names)}",
         color=discord.Colour.blurple(),
     )
@@ -361,7 +348,6 @@ async def mountlist(
 
 
 @bot.slash_command(name="addmount", description="Add mounts to your list.")
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -374,14 +360,13 @@ async def mountlist(
 )
 async def addmount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     name: str,
 ) -> None:
     """Add items to a user in the status table."""
     bot_log.info("/addmount invoked by %s", ctx.author.name)
     database = DataBase()
-    item_names = await database.list_item_names(kind)
+    item_names = await database.list_item_names(expansion)
     if name not in item_names:
         bot_log.info("Items not added, invalid names provided")
         await ctx.send_response(
@@ -394,7 +379,6 @@ async def addmount(
         await database.update_user_items(
             action="add",
             user=ctx.author.id,
-            item_kind=kind,
             item_names=name,
         )
         bot_log.info("Items added")
@@ -411,7 +395,6 @@ async def addmount(
     description="(Admin only) Add mounts for a user.",
 )
 @commands.has_role(547835267394830348)
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -425,7 +408,6 @@ async def addmount(
 @discord.option("user_name", type=str)
 async def adminaddmount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     mount_name: str,
     user_name: str,
@@ -434,7 +416,7 @@ async def adminaddmount(
     bot_log.info("/adminaddmount invoked by %s", ctx.author.name)
     database = DataBase()
     user_did = await database.get_user_discord_id(user_name)
-    item_names = await database.list_item_names(kind)
+    item_names = await database.list_item_names(expansion)
     if len(user_did) == 0:
         bot_log.info("Items not added, invalid user name provided")
         await ctx.send_response(
@@ -454,7 +436,6 @@ async def adminaddmount(
         await database.update_user_items(
             action="add",
             user=user_did[0],
-            item_kind=kind,
             item_names=mount_name,
         )
         bot_log.info("Items added")
@@ -467,7 +448,6 @@ async def adminaddmount(
 
 
 @bot.slash_command(name="removemount", description="Remove mounts from your list.")
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -480,14 +460,13 @@ async def adminaddmount(
 )
 async def removemount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     name: str,
 ) -> None:
     """Add items to a user in the status table."""
     bot_log.info("/removemount invoked by %s", ctx.author.name)
     database = DataBase()
-    item_names = await database.list_item_names(kind)
+    item_names = await database.list_item_names(expansion)
     if name not in item_names:
         bot_log.info("Items not removed, invalid names provided")
         await ctx.send_response(
@@ -500,7 +479,6 @@ async def removemount(
         await database.update_user_items(
             user=ctx.author.id,
             action="remove",
-            item_kind=kind,
             item_names=name,
         )
         bot_log.info("Items removed")
@@ -517,7 +495,6 @@ async def removemount(
     description="(Admin only) Remove mounts from a user.",
 )
 @commands.has_role(547835267394830348)
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -531,7 +508,6 @@ async def removemount(
 @discord.option("user_name", type=str)
 async def adminremovemount(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
     mount_name: str,
     user_name: str,
@@ -540,7 +516,7 @@ async def adminremovemount(
     bot_log.info("/adminremovemount invoked by %s", ctx.author.name)
     database = DataBase()
     user_did = await database.get_user_discord_id(user_name)
-    item_names = await database.list_item_names(kind)
+    item_names = await database.list_item_names(expansion)
     if len(user_did) == 0:
         bot_log.info("Items not removed, invalid user name provided")
         await ctx.send_response(
@@ -560,7 +536,6 @@ async def adminremovemount(
         await database.update_user_items(
             action="remove",
             user=user_did[0],
-            item_kind=kind,
             item_names=mount_name,
         )
         bot_log.info("Items removed")
@@ -573,7 +548,6 @@ async def adminremovemount(
 
 
 @bot.slash_command(name="mymounts", description="View your mounts.")
-@discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
     type=str,
@@ -581,7 +555,6 @@ async def adminremovemount(
 )
 async def mymounts(
     ctx: discord.ApplicationContext,
-    kind: str,
     expansion: str,
 ) -> None:
     """View list of held and needed mounts."""
@@ -590,13 +563,11 @@ async def mymounts(
     has_mounts = await database.list_user_items(
         user=ctx.author.id,
         check_type="has",
-        kind=kind,
         expansion=expansion,
     )
     needs_mounts = await database.list_user_items(
         user=ctx.author.id,
         check_type="needs",
-        kind=kind,
         expansion=expansion,
     )
     bot_log.info("Item lists generated")
@@ -610,7 +581,7 @@ async def mymounts(
     }
     image_url = image_urls[expansion]
     embed = discord.Embed(
-        title=f"{expansion.capitalize()} {kind}",
+        title=f"{expansion.capitalize()} mounts",
         color=discord.Colour.blurple(),
     )
     embed.add_field(
