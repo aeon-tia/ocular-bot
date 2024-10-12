@@ -37,7 +37,7 @@ async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
     return mounts  # noqa: RET504
 
 
-async def get_expansion_names(ctx: discord.AutocompleteContext) -> list[str]:
+async def get_expansion_names(ctx: discord.AutocompleteContext) -> list[str]:  # noqa: ARG001
     """Fetch list of mount names for autocomplete."""
     database = DataBase()
     expansions = await database.list_expansions()
