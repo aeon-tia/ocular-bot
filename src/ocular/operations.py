@@ -23,7 +23,7 @@ class DataBase:
         self.db_path = "./data/bot.db"
 
     async def db_execute_literal(self: Self, query: str) -> None:
-        """Execute a DB query with the qmarks placeholder syntax."""
+        """Execute a DB write query directly string."""
         async with aiosqlite.connect(self.db_path) as db:
             db.row_factory = dict_factory
             cs = await db.cursor()
