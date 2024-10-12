@@ -190,7 +190,7 @@ async def dbrenamemount(
         bot_log.info(
             "Renaming %s mount from %s to %s", expansion, from_name, to_name,
         )
-        await database.edit_item_name("mounts", from_name, to_name)
+        await database.edit_item_name(from_name, to_name)
         bot_log.info("Generating message")
         await ctx.send_response(
             content=f"Renamed `{expansion}` mount `{from_name}` to `{to_name}`.",
