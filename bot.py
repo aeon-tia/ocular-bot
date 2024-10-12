@@ -64,7 +64,7 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
     name="dbcreatemount",
     description="(Admin only) Create a new mount in the database.",
 )
-@commands.is_owner()
+@commands.has_role(547835267394830348)
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
@@ -110,7 +110,7 @@ async def dbcreatemount(
     name="dbdeletemount",
     description="(Admin only) Delete a mount from the database.",
 )
-@commands.is_owner()
+@commands.has_role(547835267394830348)
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
@@ -156,7 +156,7 @@ async def dbdeletemount(
     name="dbrenamemount",
     description="(Admin only) Rename a mount in the database.",
 )
-@commands.is_owner()
+@commands.has_role(547835267394830348)
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
@@ -219,7 +219,7 @@ async def dbrenamemount(
     name="dbrenameuser",
     description="(Admin only) Change the name of a user in the database.",
 )
-@commands.is_owner()
+@commands.has_role(547835267394830348)
 async def dbrenameuser(
     ctx: discord.ApplicationContext,
     from_name: str,
@@ -410,7 +410,7 @@ async def addmount(
     name="adminaddmount",
     description="(Admin only) Add mounts for a user.",
 )
-@commands.is_owner()
+@commands.has_role(547835267394830348)
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
@@ -516,7 +516,7 @@ async def removemount(
     name="adminremovemount",
     description="(Admin only) Remove mounts from a user.",
 )
-@commands.is_owner()
+@commands.has_role(547835267394830348)
 @discord.option("kind", type=str, choices=["trials", "raids"])
 @discord.option(
     "expansion",
