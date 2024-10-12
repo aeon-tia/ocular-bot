@@ -115,7 +115,7 @@ async def dbcreatemount(
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
 )
 @discord.option(
-    "name", type=str, autocomplete=discord.utils.basic_autocomplete(get_mount_names)
+    "name", type=str, autocomplete=discord.utils.basic_autocomplete(get_mount_names),
 )
 async def dbdeletemount(
     ctx: discord.ApplicationContext,
