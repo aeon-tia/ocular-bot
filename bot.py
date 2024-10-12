@@ -36,7 +36,7 @@ async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
     return mounts  # noqa: RET504
 
 
-async def get_expansion_names() -> list[str]:
+async def get_expansion_names(ctx: discord.AutocompleteContext) -> list[str]:
     """Fetch list of mount names for autocomplete."""
     database = DataBase()
     expansions = await database.list_expansions()
@@ -332,10 +332,7 @@ async def mountlist(
     """Show a list of available mount names."""
     bot_log.info("/mountlist invoked by %s", ctx.author.name)
     database = DataBase()
-    item_names = await database.list_item_names(
-        table_name="mounts",
-        expansion=expansion,
-    )
+    item_names = await database.list_item_names(expansion)
     bot_log.info("Item lists generated")
     embed = discord.Embed(
         title=f"{expansion.capitalize()} mounts",
