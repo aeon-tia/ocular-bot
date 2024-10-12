@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from src.ocular.operations import DataBase
 
 log_formatter = logging.Formatter(
-    "{asctime} {levelname} {funcName}:{lineno} {message}", style="{",
+    "{asctime} | {levelname:8s} | {funcName}:{lineno} {message}", style="{",
 )
 log_handler = RotatingFileHandler(
     filename="bot.log",
