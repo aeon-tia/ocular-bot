@@ -92,7 +92,7 @@ async def dbcreatemount(
             delete_after=90,
         )
     else:
-        bot_log.info("Adding new %s %s to database", expansion, name)
+        bot_log.info("Adding new %s mount %s to database", expansion, name)
         await database.add_new_item(expansion, name)
         bot_log.info("Generating message")
         await ctx.send_response(
@@ -132,7 +132,7 @@ async def dbdeletemount(
             delete_after=90,
         )
     else:
-        bot_log.info("Deleting %s %s mount %s", expansion, name)
+        bot_log.info("Deleting %s mount %s", expansion, name)
         await database.delete_item(name)
         bot_log.info("Generating message")
         await ctx.send_response(
@@ -188,7 +188,7 @@ async def dbrenamemount(
         )
     else:
         bot_log.info(
-            "Renaming %s %s mount from %s to %s", expansion, from_name, to_name,
+            "Renaming %s mount from %s to %s", expansion, from_name, to_name,
         )
         await database.edit_item_name("mounts", from_name, to_name)
         bot_log.info("Generating message")
