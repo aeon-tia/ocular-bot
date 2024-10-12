@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 from src.ocular.operations import DataBase
 
 log_formatter = logging.Formatter(
-    "{asctime} | {levelname:8s} | {funcName}:{lineno} {message}", style="{",
+    "{asctime} | {levelname:8s} | {funcName}:{lineno} {message}",
+    style="{",
 )
 log_handler = RotatingFileHandler(
     filename="bot.log",
@@ -188,7 +189,10 @@ async def dbrenamemount(
         )
     else:
         bot_log.info(
-            "Renaming %s mount from %s to %s", expansion, from_name, to_name,
+            "Renaming %s mount from %s to %s",
+            expansion,
+            from_name,
+            to_name,
         )
         await database.edit_item_name(from_name, to_name)
         bot_log.info("Generating message")
