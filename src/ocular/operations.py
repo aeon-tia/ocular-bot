@@ -54,33 +54,21 @@ class DataBase:
             await cs.execute(query)
             return await cs.fetchall()
 
-    async def init_trial_table(self: Self) -> tuple[dict]:
-        """Create rows for initializing trials table."""
-        rows = tuple(json.load(Path.open("./assets/inputs/mounts.json"))["trials"])
+    async def init_mount_table(self: Self) -> tuple[dict]:
+        """Create rows for initializing mounts table."""
+        trials = tuple(json.load(Path.open("./assets/inputs/mounts.json"))["trials"])
+        raids = tuple(json.load(Path.open("./assets/inputs/mounts.json"))["raids"])
         query = """
             CREATE TABLE IF NOT EXISTS
-            trials(item_id STRING, item_name STRING, item_expac STRING)
+            mounts(item_id STRING, item_name STRING, item_expac STRING)
         """
         await self.db_execute_literal(query)
-        table_shape = await self.check_table_shape("trials")
+        table_shape = await self.check_table_shape("mounts")
         if table_shape != (0, 0):
-            msg = "Trials table is not empty, initial rows not appended."
+            msg = "Mounts table is not empty, initial rows not appended."
             raise AssertionError(msg)
-        await self.append_to_trial_table(rows)
-
-    async def init_raid_table(self: Self) -> tuple[dict]:
-        """Create rows for initializing raid table."""
-        rows = tuple(json.load(Path.open("./assets/inputs/mounts.json"))["raids"])
-        query = """
-            CREATE TABLE IF NOT EXISTS
-            raids(item_id STRING, item_name STRING, item_expac STRING)
-        """
-        await self.db_execute_literal(query)
-        table_shape = await self.check_table_shape("raids")
-        if table_shape != (0, 0):
-            msg = "Raids table is not empty, initial rows not appended."
-            raise AssertionError(msg)
-        await self.append_to_raid_table(rows)
+        await self.append_to_mount_table(trials)
+        await self.append_to_mount_table(raids)
 
     async def init_user_table(self: Self) -> None:
         """Initialize user table."""
@@ -109,8 +97,7 @@ class DataBase:
         if not data_dir.joinpath("bot.db").exists():
             data_dir.mkdir(parents=True, exist_ok=True)
             await self.init_user_table()
-            await self.init_raid_table()
-            await self.init_trial_table()
+            await self.init_mount_table()
             await self.init_status_table()
 
     def create_user_row(self: Self, name: str, discord_id: int) -> tuple[dict]:
@@ -129,8 +116,8 @@ class DataBase:
         query = "INSERT INTO users VALUES(:user_id, :user_name, :user_discord_id)"
         await self.db_execute_dictuple(query, row)
 
-    async def append_to_trial_table(self: Self, new_rows: tuple[dict]) -> None:
-        """Add new trials to the trials table.
+    async def append_to_mount_table(self: Self, new_rows: tuple[dict]) -> None:
+        """Add new mounts to the mount table.
 
         Parameters
         ----------
@@ -139,20 +126,7 @@ class DataBase:
             item_name. Each new row should be a separate dict.
 
         """
-        query = "INSERT INTO trials VALUES(:item_id, :item_name, :item_expac)"
-        await self.db_execute_dictuple(query, new_rows)
-
-    async def append_to_raid_table(self: Self, new_rows: tuple[dict]) -> None:
-        """Add new raids to the raids table.
-
-        Parameters
-        ----------
-        new_rows : tuple[dict]
-            Rows to append to raid table. Must be keyed by item_id and
-            item_name. Each new row should be a separate dict.
-
-        """
-        query = "INSERT INTO raids VALUES(:item_id, :item_name, :item_expac)"
+        query = "INSERT INTO mounts VALUES(:item_id, :item_name, :item_expac)"
         await self.db_execute_dictuple(query, new_rows)
 
     async def append_to_status_table(self: Self, new_rows: tuple[dict]) -> None:
@@ -218,14 +192,9 @@ class DataBase:
         query = "SELECT * FROM users"
         return await self.db_read_table(query)
 
-    async def get_trial_table(self: Self) -> tuple[dict]:
-        """Get trial table as tuple of dict."""
-        query = "SELECT * FROM trials"
-        return await self.db_read_table(query)
-
-    async def get_raid_table(self: Self) -> tuple[dict]:
-        """Get raid table as tuple of dict."""
-        query = "SELECT * FROM raids"
+    async def get_mount_table(self: Self) -> tuple[dict]:
+        """Get mount table as tuple of dict."""
+        query = "SELECT * FROM mounts"
         return await self.db_read_table(query)
 
     async def get_status_table(self: Self) -> tuple[dict]:
@@ -235,13 +204,13 @@ class DataBase:
 
     async def read_table_polars(
         self: Self,
-        table_name: Literal["users", "trials", "raids", "status"],
+        table_name: Literal["users", "mounts", "status"],
     ) -> pl.DataFrame:
         """Read a database table into a Polars DataFrame.
 
         Parameters
         ----------
-        table_name : Literal["users", "trials", "raids", "status"]
+        table_name : Literal["users", "mounts", "status"]
             Name of database table to return.
 
         Returns
@@ -252,10 +221,8 @@ class DataBase:
         """
         if table_name == "users":
             table = pl.DataFrame(await self.get_user_table())
-        if table_name == "trials":
-            table = pl.DataFrame(await self.get_trial_table())
-        if table_name == "raids":
-            table = pl.DataFrame(await self.get_raid_table())
+        if table_name == "mounts":
+            table = pl.DataFrame(await self.get_mount_table())
         if table_name == "status":
             table = pl.DataFrame(await self.get_status_table())
         return table
@@ -263,12 +230,9 @@ class DataBase:
     async def append_new_status(self: Self, discord_id: str) -> tuple[dict]:
         """Create status table rows for a new user."""
         user = await self.get_user_from_discord_id(discord_id)
-        trials = await self.read_table_polars("trials")
-        raids = await self.read_table_polars("raids")
-        trials = trials.select(["item_id"]).with_columns(item_kind=pl.lit("trials"))
-        raids = raids.select(["item_id"]).with_columns(item_kind=pl.lit("raids"))
+        mounts = await self.read_table_polars("mounts")
         rows = tuple(
-            pl.concat([trials, raids])
+            mounts
             .with_columns(
                 user_id=pl.lit(user),
                 has_item=pl.lit(0).cast(pl.Int64),
@@ -280,12 +244,11 @@ class DataBase:
 
     async def get_item_ids(
         self: Self,
-        item_kind: Literal["trials", "raids"],
         item_names: str,
     ) -> tuple[int]:
         """Get a list of item IDs from a specified item table."""
         item_names = item_names.split(",")
-        items = await self.read_table_polars(item_kind)
+        items = await self.read_table_polars("mounts")
         items = items.filter(pl.col("item_name").is_in(item_names)).select("item_id")
         return tuple(items.to_series().to_list())
 
@@ -293,12 +256,11 @@ class DataBase:
         self: Self,
         action: Literal["add", "remove"],
         user: int,
-        item_kind: Literal["trials", "raids"],
         item_names: list[str],
     ) -> tuple[dict]:
         """Update entries for a user in the status table."""
         user_id = await self.get_user_from_discord_id(user)
-        items = await self.get_item_ids(item_kind, item_names)
+        items = await self.get_item_ids(item_names)
         if action == "add":
             has_item_entry = 1
         elif action == "remove":
@@ -309,15 +271,15 @@ class DataBase:
         query = """
             UPDATE status
             SET has_item = ?
-            WHERE user_id = ? AND item_kind = ? AND item_id = ?
+            WHERE user_id = ? AND AND item_id = ?
         """
         for item in items:
-            params = (has_item_entry, user_id, item_kind, item)
+            params = (has_item_entry, user_id, item)
             await self.db_execute_qmark(query, params)
 
     async def check_table_shape(
         self: Self,
-        table_name: Literal["users", "trials", "raids", "status"],
+        table_name: Literal["users", "mounts", "status"],
     ) -> bool:
         """Check the shape of a database table."""
         table = await self.read_table_polars(table_name)
@@ -338,11 +300,10 @@ class DataBase:
 
     async def list_item_names(
         self: Self,
-        table_name: Literal["trials", "raids"],
         expansion: None | str = None,
     ) -> list[str]:
         """Get a list of item names from a DB table."""
-        table = await self.read_table_polars(table_name)
+        table = await self.read_table_polars("mounts")
         if expansion is None:
             return table.select("item_name").to_series().to_list()
         return (
@@ -354,28 +315,25 @@ class DataBase:
 
     async def list_expansions(
         self: Self,
-        kind: Literal["trials", "raids"],
     ) -> list[str]:
         """Get list of expansions in a table."""
-        table = await self.read_table_polars(kind)
+        table = await self.read_table_polars("mounts")
         return table.select("item_expac").to_series().unique().to_list()
 
     async def list_user_items(
         self: Self,
         user: int,
         check_type: Literal["has", "needs"],
-        kind: Literal["trials", "raids"],
         expansion: str,
     ) -> list[str]:
         """Get list of mounts a user has or needs."""
         user_id = await self.get_user_from_discord_id(user)
         status_table = await self.read_table_polars("status")
-        item_table = await self.read_table_polars(kind)
+        item_table = await self.read_table_polars("mounts")
         check_val = 1 if check_type == "has" else 0
         status_table = (
             status_table.filter(
                 (pl.col("user_id") == user_id)
-                & (pl.col("item_kind") == kind)
                 & (pl.col("has_item") == check_val),
             )
         ).select("item_id")
@@ -392,44 +350,32 @@ class DataBase:
 
     async def edit_item_name(
         self: Self,
-        item_kind: Literal["trials", "raids"],
         old_name: str,
         new_name: str,
     ) -> None:
         """Edit an item name."""
-        item_id = await self.get_item_ids(item_kind, old_name)
-        if item_kind == "trials":
-            query = "UPDATE trials SET item_name = ? WHERE item_id = ?"
-        if item_kind == "raids":
-            query = "UPDATE raids SET item_name = ? WHERE item_id = ?"
+        item_id = await self.get_item_ids(old_name)
+        query = "UPDATE mounts SET item_name = ? WHERE item_id = ?"
         params = (new_name, item_id[0])
         await self.db_execute_qmark(query, params)
 
     async def add_new_item(
         self: Self,
-        kind: Literal["trials", "raids"],
         expansion: str,
         name: str,
     ) -> None:
         """Edit an item name."""
         new_row = self.create_item_row(name, expansion)
-        if kind == "trials":
-            await self.append_to_trial_table(new_row)
-        if kind == "raids":
-            await self.append_to_raid_table(new_row)
+        await self.append_to_mount_table(new_row)
 
     async def delete_item(
         self: Self,
-        kind: Literal["trials", "raids"],
         name: str,
     ) -> None:
         """Remove mounts from the database."""
-        item_id = await self.get_item_ids(kind, name)
+        item_id = await self.get_item_ids(name)
         params = tuple(item_id)
-        if kind == "trials":
-            query = "DELETE FROM trials WHERE item_id = ?"
-        if kind == "raids":
-            query = "DELETE FROM raids WHERE item_id = ?"
+        query = "DELETE FROM mounts WHERE item_id = ?"
         await self.db_execute_qmark(query, params)
 
     async def delete_user(self: Self, name: str) -> None:
