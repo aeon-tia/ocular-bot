@@ -85,7 +85,6 @@ class DataBase:
             status(
                 user_id STRING,
                 item_id STRING,
-                item_kind STRING,
                 has_item INTEGER
             )
         """
@@ -136,11 +135,11 @@ class DataBase:
         ----------
         new_rows : tuple[dict]
             Rows to append to status table. Must be keyed by user_id,
-            item_id, item_kind and has_item. Each new row should be a
+            item_id, and has_item. Each new row should be a
             separate dict.
 
         """
-        query = "INSERT INTO status VALUES(:user_id, :item_id, :item_kind, :has_item)"
+        query = "INSERT INTO status VALUES(:user_id, :item_id, :has_item)"
         await self.db_execute_dictuple(query, new_rows)
 
     async def get_user_id(self: Self, user_name: str) -> str:
@@ -271,7 +270,7 @@ class DataBase:
         query = """
             UPDATE status
             SET has_item = ?
-            WHERE user_id = ? AND AND item_id = ?
+            WHERE user_id = ? AND item_id = ?
         """
         for item in items:
             params = (has_item_entry, user_id, item)
