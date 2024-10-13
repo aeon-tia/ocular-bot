@@ -247,7 +247,10 @@ class DataBase:
     ) -> str:
         """Get a list of item IDs from a specified item table."""
         items = await self.read_table_polars("mounts")
-        return (items.filter(item_name=item_name).select("item_id").item(),)
+        item_id = items.filter(item_name=item_name).select("item_id")
+        if item_id.shape != (0, 1):
+            return (item_id.item(),)
+        return ()
 
     async def update_user_items(
         self: Self,
