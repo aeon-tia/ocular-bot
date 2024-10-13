@@ -374,8 +374,10 @@ class DataBase:
         """Remove mounts from the database."""
         item_id = await self.get_item_ids(name)
         params = tuple(item_id)
-        query = "DELETE FROM mounts WHERE item_id = ?"
-        await self.db_execute_qmark(query, params)
+        mounts_query = "DELETE FROM mounts WHERE item_id = ?"
+        status_query = "DELETE FROM status WHERE item_id = ?"
+        await self.db_execute_qmark(mounts_query, params)
+        await self.db_execute_qmark(status_query, params)
 
     async def delete_user(self: Self, name: str) -> None:
         """Remove users from the database."""
