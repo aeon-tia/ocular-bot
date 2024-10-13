@@ -381,5 +381,7 @@ class DataBase:
         """Remove users from the database."""
         user_id = await self.get_user_id(name)
         params = (user_id,)
-        query = "DELETE FROM users WHERE user_id = ?"
-        await self.db_execute_qmark(query, params)
+        user_query = "DELETE FROM users WHERE user_id = ?"
+        status_query = "DELETE FROM status WHERE user_id = ?"
+        await self.db_execute_qmark(user_query, params)
+        await self.db_execute_qmark(status_query, params)
