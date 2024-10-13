@@ -83,7 +83,7 @@ async def dbcreatemount(
     """Create new mounts in the database."""
     bot_log.info("/dbcreatemount invoked by %s", ctx.author.name)
     database = DataBase()
-    item_id = await database.get_item_ids(name)
+    item_id = await database.get_item_id(name)
     already_exists = len(item_id) != 0
     if already_exists:
         bot_log.info("Stopping because matching mount name found")
@@ -125,7 +125,7 @@ async def dbdeletemount(
     """Delete a mount from the database."""
     bot_log.info("/dbdeletemount invoked by %s", ctx.author.name)
     database = DataBase()
-    item_id = await database.get_item_ids(name)
+    item_id = await database.get_item_id(name)
     no_match = len(item_id) == 0
     if no_match:
         bot_log.info("Stopping because no matching mount name found")
@@ -171,8 +171,8 @@ async def dbrenamemount(
     """Edit the name of a mount in the database."""
     bot_log.info("/dbrenamemount invoked by %s", ctx.author.name)
     database = DataBase()
-    from_item_id = await database.get_item_ids(from_name)
-    to_item_id = await database.get_item_ids(to_name)
+    from_item_id = await database.get_item_id(from_name)
+    to_item_id = await database.get_item_id(to_name)
     no_from_name_found = len(from_item_id) == 0
     to_name_found = len(to_item_id) != 0
     if no_from_name_found:
