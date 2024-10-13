@@ -241,15 +241,13 @@ class DataBase:
         await self.append_to_status_table(rows)
         return rows
 
-    async def get_item_ids(
+    async def get_item_id(
         self: Self,
-        item_names: str,
-    ) -> tuple[int]:
+        item_name: str,
+    ) -> str:
         """Get a list of item IDs from a specified item table."""
-        item_names = item_names.split(",")
         items = await self.read_table_polars("mounts")
-        items = items.filter(pl.col("item_name").is_in(item_names)).select("item_id")
-        return tuple(items.to_series().to_list())
+        return (items.filter(item_name=item_name).select("item_id").item(),)
 
     async def update_user_items(
         self: Self,
@@ -259,7 +257,7 @@ class DataBase:
     ) -> tuple[dict]:
         """Update entries for a user in the status table."""
         user_id = await self.get_user_from_discord_id(user)
-        items = await self.get_item_ids(item_names)
+        items = await self.get_item_id(item_names)
         if action == "add":
             has_item_entry = 1
         elif action == "remove":
@@ -353,7 +351,7 @@ class DataBase:
         new_name: str,
     ) -> None:
         """Edit an item name."""
-        item_id = await self.get_item_ids(old_name)
+        item_id = await self.get_item_id(old_name)
         query = "UPDATE mounts SET item_name = ? WHERE item_id = ?"
         params = (new_name, item_id[0])
         await self.db_execute_qmark(query, params)
@@ -364,15 +362,25 @@ class DataBase:
         name: str,
     ) -> None:
         """Edit an item name."""
-        new_row = self.create_item_row(name, expansion)
-        await self.append_to_mount_table(new_row)
+        new_mount_row = self.create_item_row(name, expansion)
+        await self.append_to_mount_table(new_mount_row)
+        user_table = await self.read_table_polars("users")
+        new_item_id = await self.get_item_id(name)
+        new_status_rows = user_table.select("user_id")
+        new_status_rows = tuple(
+            new_status_rows.with_columns(
+                item_id=pl.lit(new_item_id[0]),
+                has_item=pl.lit(0),
+            ).to_dicts(),
+        )
+        await self.append_to_status_table(new_status_rows)
 
     async def delete_item(
         self: Self,
         name: str,
     ) -> None:
         """Remove mounts from the database."""
-        item_id = await self.get_item_ids(name)
+        item_id = await self.get_item_id(name)
         params = tuple(item_id)
         mounts_query = "DELETE FROM mounts WHERE item_id = ?"
         status_query = "DELETE FROM status WHERE item_id = ?"
