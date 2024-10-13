@@ -211,6 +211,8 @@ async def dbrenamemount(
     description="(Admin only) Change the name of a user in the database.",
 )
 @commands.has_role(547835267394830348)
+@discord.option("from_name", type=str)
+@discord.option("to_name", type=str)
 async def dbrenameuser(
     ctx: discord.ApplicationContext,
     from_name: str,
@@ -255,6 +257,41 @@ async def dbrenameuser(
         )
     bot_log.info("/dbrenameuser OK")
 
+
+@bot.slash_command(
+    name="dbdeleteuser",
+    description="(Admin only) Delete a user from the database.",
+)
+@commands.has_role(547835267394830348)
+@discord.option("name", type=str)
+async def dbdeleteuser(
+    ctx: discord.ApplicationContext,
+    name: str,
+) -> None:
+    """Delete a user from the database."""
+    bot_log.info("/dbdeleteuser invoked by %s", ctx.author.name)
+    database = DataBase()
+    from_name_exists = await database.check_user_exists(
+        check_col="user_name",
+        check_val=name,
+    )
+    if not from_name_exists:
+        bot_log.info("User not deleted because user name %s not found", name)
+        await ctx.send_response(
+            content=f"I don't have a user named `{name}` in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        bot_log.info("Deleting user %s", name)
+        await database.delete_user()
+        bot_log.info("Generating message")
+        await ctx.send_response(
+            content=f"User name `{name}` deleted.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    bot_log.info("/dbdeleteuser OK")
 
 @bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
 @discord.option("name", type=str)
