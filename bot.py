@@ -419,7 +419,7 @@ async def addmount(
         )
         bot_log.info("Items added")
         await ctx.send_response(
-            content=f"Added `{expansion}` mount `{name}`",
+            content=f"Added `{name}` to your `{expansion}` mounts.",
             ephemeral=True,
             delete_after=90,
         )
@@ -519,7 +519,7 @@ async def removemount(
         )
         bot_log.info("Items removed")
         await ctx.send_response(
-            content=f"Removed `{expansion}` mount `{name}`",
+            content=f"Removed `{name}` from your `{expansion}` mounts.",
             ephemeral=True,
             delete_after=90,
         )
