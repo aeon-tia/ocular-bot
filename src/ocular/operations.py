@@ -162,12 +162,10 @@ class DataBase:
     async def get_user_discord_id(self: Self, user_name: str) -> int:
         """Get a user discord ID from user name."""
         user_table = await self.read_table_polars("users")
-        return (
-            user_table.filter(pl.col("user_name") == user_name)
-            .select("user_discord_id")
-            .to_series()
-            .to_list()
-        )
+        user_row = user_table.filter(pl.col("user_name") == user_name)
+        if user_row.shape == (0, 1):
+            return []
+        return [user_row.select("user_discord_id").item()]
 
     async def get_user_from_discord_id(self: Self, discord_id: str) -> str:
         """Get a user id from the user table.
