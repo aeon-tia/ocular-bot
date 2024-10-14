@@ -637,6 +637,64 @@ async def mymounts(
     bot_log.info("/mymounts OK")
 
 
+@bot.slash_command(
+    name="adminusermounts",
+    description="(Admin only) View another users mounts.",
+)
+@commands.has_role(547835267394830348)
+@discord.option("user_name", type=str)
+@discord.option(
+    "expansion",
+    type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+)
+async def adminusermounts(
+    ctx: discord.ApplicationContext,
+    user_name: str,
+    expansion: str,
+) -> None:
+    """View list of held and needed mounts."""
+    bot_log.info("/adminusermounts invoked by %s", ctx.author.name)
+    database = DataBase()
+    user_did = await database.get_user_discord_id(user_name)
+    if len(user_did) == 0:
+        bot_log.info("User name {user_name} not found")
+        await ctx.send_response(
+            content=f"`I don't have a user named `{user_name}` in my database.",
+            ephemeral=True,
+            delete_after=90,
+        )
+    else:
+        has_mounts = await database.list_user_items(
+            user=user_did[0],
+            check_type="has",
+            expansion=expansion,
+        )
+        needs_mounts = await database.list_user_items(
+            user=user_did[0],
+            check_type="needs",
+            expansion=expansion,
+        )
+        bot_log.info("Item lists generated")
+        embed = discord.Embed(
+            title=f"{expansion.capitalize()} mounts for `{user_name}`",
+            color=discord.Colour.blurple(),
+        )
+        embed.add_field(
+            name="Have",
+            value=f" - {'\n - '.join(has_mounts)}",
+            inline=True,
+        )
+        embed.add_field(
+            name="Need",
+            value=f" - {'\n - '.join(needs_mounts)}",
+            inline=True,
+        )
+        bot_log.info("Message generated")
+        await ctx.send_response(embed=embed, ephemeral=True)
+    bot_log.info("/adminusermounts OK")
+
+
 def main() -> None:
     """Run program."""
     bot_log.info("Launching Ocular")
