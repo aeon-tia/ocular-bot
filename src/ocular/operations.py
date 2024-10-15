@@ -393,3 +393,25 @@ class DataBase:
         status_query = "DELETE FROM status WHERE user_id = ?"
         await self.db_execute_qmark(user_query, params)
         await self.db_execute_qmark(status_query, params)
+
+    async def summarize_needed_mounts(self: Self) -> list[str]:
+        """Return list summarizing how many people need what."""
+        status_table = await self.read_table_polars("status")
+        mounts_table = await self.read_table_polars("mounts")
+        summary = status_table.group_by("item_id").agg(
+            (pl.col("has_item") == 0).sum().alias("need_count"),
+        )
+        summary = summary.join(mounts_table, on="item_id").select(
+            ["item_expac", "item_name", "need_count"],
+        )
+        return (
+            summary.with_columns(
+                pl.concat_str(
+                    [pl.col("item_expac"), pl.col("item_name"), pl.col("need_count")],
+                    separator=": ",
+                ).alias("output"),
+            )
+            .select("output")
+            .to_series()
+            .to_list()
+        )
