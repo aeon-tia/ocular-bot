@@ -728,7 +728,7 @@ async def mostneeded(ctx: discord.ApplicationContext, n_out: int) -> None:
     bot_log.info("Generating message")
     embed = discord.Embed(
             title="Most commonly needed mounts",
-            color=discord.Colour.dark_grey(),
+            color=discord.Colour.blurple(),
         )
     embed.add_field(
             name=f"Top `{n_out}`",
