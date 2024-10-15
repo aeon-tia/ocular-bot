@@ -229,12 +229,10 @@ class DataBase:
         user = await self.get_user_from_discord_id(discord_id)
         mounts = await self.read_table_polars("mounts")
         rows = tuple(
-            mounts
-            .with_columns(
+            mounts.with_columns(
                 user_id=pl.lit(user),
                 has_item=pl.lit(0).cast(pl.Int64),
-            )
-            .to_dicts(),
+            ).to_dicts(),
         )
         await self.append_to_status_table(rows)
         return rows
@@ -331,8 +329,7 @@ class DataBase:
         check_val = 1 if check_type == "has" else 0
         status_table = (
             status_table.filter(
-                (pl.col("user_id") == user_id)
-                & (pl.col("has_item") == check_val),
+                (pl.col("user_id") == user_id) & (pl.col("has_item") == check_val),
             )
         ).select("item_id")
         item_names = (
