@@ -695,6 +695,32 @@ async def adminusermounts(
     bot_log.info("/adminusermounts OK")
 
 
+@bot.slash_command(
+    name="mostneeded",
+    description="Count the most needed mounts.",
+)
+@discord.option("n_out", type=int, description="Number of results to output.")
+async def mostneeded(ctx: discord.ApplicationContext, n_out: int) -> None:
+    """Count which mounts are needed by the most users."""
+    bot_log.info("/adminusermounts invoked by %s", ctx.author.name)
+    bot_log.info("Querying database")
+    database = DataBase()
+    meeded_mounts = await database.summarize_needed_mounts()
+    output = meeded_mounts[0:n_out]
+    bot_log.info("Generating message")
+    embed = discord.Embed(
+            title="Most commonly needed mounts",
+            color=discord.Colour.dark_grey(),
+        )
+    embed.add_field(
+            name=f"Top `{n_out}`",
+            value=f" - {'\n - '.join(output)}",
+            inline=True,
+        )
+    await ctx.send_response(embed=embed, ephemeral=True)
+    bot_log.info("/adminusermounts OK")
+
+
 def main() -> None:
     """Run program."""
     bot_log.info("Launching Ocular")
