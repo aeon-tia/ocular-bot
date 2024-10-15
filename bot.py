@@ -52,7 +52,7 @@ async def on_ready() -> None:
     bot_log.info("%s is ready!", bot.user)
 
 
-@bot.slash_command(name="ocular", description="Confirm the bot is responsive.")
+@bot.slash_command(name="ocular", description="Confirm the bot is responsive")
 async def ocular(ctx: discord.ApplicationContext) -> None:
     """Check if the bot responds."""
     bot_log.info("/ocular invoked by %s", ctx.author.name)
@@ -62,18 +62,20 @@ async def ocular(ctx: discord.ApplicationContext) -> None:
 
 @bot.slash_command(
     name="dbcreatemount",
-    description="(Admin only) Create a new mount in the database.",
+    description="(Admin only) Create a new mount in the database",
 )
 @commands.has_role(547835267394830348)
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
     "name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name to create",
 )
 async def dbcreatemount(
     ctx: discord.ApplicationContext,
@@ -106,16 +108,19 @@ async def dbcreatemount(
 
 @bot.slash_command(
     name="dbdeletemount",
-    description="(Admin only) Delete a mount from the database.",
+    description="(Admin only) Delete a mount from the database",
 )
 @commands.has_role(547835267394830348)
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
-    "name", type=str, autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    "name", type=str,
+    autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name to delete",
 )
 async def dbdeletemount(
     ctx: discord.ApplicationContext,
@@ -148,20 +153,22 @@ async def dbdeletemount(
 
 @bot.slash_command(
     name="dbrenamemount",
-    description="(Admin only) Rename a mount in the database.",
+    description="(Admin only) Rename a mount in the database",
 )
 @commands.has_role(547835267394830348)
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
     "from_name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name to change",
 )
-@discord.option("to_name", type=str)
+@discord.option("to_name", type=str, description="Mount name to assign")
 async def dbrenamemount(
     ctx: discord.ApplicationContext,
     expansion: str,
@@ -208,11 +215,11 @@ async def dbrenamemount(
 
 @bot.slash_command(
     name="dbrenameuser",
-    description="(Admin only) Change the name of a user in the database.",
+    description="(Admin only) Change the name of a user in the database",
 )
 @commands.has_role(547835267394830348)
-@discord.option("from_name", type=str)
-@discord.option("to_name", type=str)
+@discord.option("from_name", type=str, description="User name to change")
+@discord.option("to_name", type=str, description="User name to assign")
 async def dbrenameuser(
     ctx: discord.ApplicationContext,
     from_name: str,
@@ -263,7 +270,7 @@ async def dbrenameuser(
     description="(Admin only) Delete a user from the database.",
 )
 @commands.has_role(547835267394830348)
-@discord.option("name", type=str)
+@discord.option("name", type=str, description="Name of user to delete")
 async def dbdeleteuser(
     ctx: discord.ApplicationContext,
     name: str,
@@ -293,8 +300,8 @@ async def dbdeleteuser(
         )
     bot_log.info("/dbdeleteuser OK")
 
-@bot.slash_command(name="addme", description="Add yourself to the bot's user list.")
-@discord.option("name", type=str)
+@bot.slash_command(name="addme", description="Add yourself to the bot's user list")
+@discord.option("name", type=str, description="Name to give yourself in the database")
 async def addme(ctx: discord.ApplicationContext, name: str) -> None:
     """Add user to the user table."""
     bot_log.info("/addme invoked by %s", ctx.author.name)
@@ -340,7 +347,7 @@ async def addme(ctx: discord.ApplicationContext, name: str) -> None:
     bot_log.info("/addme OK")
 
 
-@bot.slash_command(name="userlist", description="List users in the database.")
+@bot.slash_command(name="userlist", description="List users in the database")
 async def userlist(ctx: discord.ApplicationContext) -> None:
     """Get the list of all users in the database."""
     bot_log.info("/userlist invoked by %s", ctx.author.name)
@@ -358,11 +365,12 @@ async def userlist(ctx: discord.ApplicationContext) -> None:
     bot_log.info("/userlist OK")
 
 
-@bot.slash_command(name="mountlist", description="List available mount names.")
+@bot.slash_command(name="mountlist", description="List available mount names")
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Expansion to list mounts from",
 )
 async def mountlist(
     ctx: discord.ApplicationContext,
@@ -383,16 +391,18 @@ async def mountlist(
     bot_log.info("/mountlist OK")
 
 
-@bot.slash_command(name="addmount", description="Add mounts to your list.")
+@bot.slash_command(name="addmount", description="Add mounts to your list")
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
     "name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name",
 )
 async def addmount(
     ctx: discord.ApplicationContext,
@@ -428,20 +438,22 @@ async def addmount(
 
 @bot.slash_command(
     name="adminaddmount",
-    description="(Admin only) Add mounts for a user.",
+    description="(Admin only) Add mounts for a user",
 )
 @commands.has_role(547835267394830348)
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
     "mount_name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name",
 )
-@discord.option("user_name", type=str)
+@discord.option("user_name", type=str, description="User to add mounts for")
 async def adminaddmount(
     ctx: discord.ApplicationContext,
     expansion: str,
@@ -483,16 +495,18 @@ async def adminaddmount(
     bot_log.info("/adminaddmount OK")
 
 
-@bot.slash_command(name="removemount", description="Remove mounts from your list.")
+@bot.slash_command(name="removemount", description="Remove mounts from your list")
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
     "name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name",
 )
 async def removemount(
     ctx: discord.ApplicationContext,
@@ -528,20 +542,22 @@ async def removemount(
 
 @bot.slash_command(
     name="adminremovemount",
-    description="(Admin only) Remove mounts from a user.",
+    description="(Admin only) Remove mounts from a user",
 )
 @commands.has_role(547835267394830348)
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Mount expansion",
 )
 @discord.option(
     "mount_name",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+    description="Mount name",
 )
-@discord.option("user_name", type=str)
+@discord.option("user_name", type=str, description="User to remove mount from")
 async def adminremovemount(
     ctx: discord.ApplicationContext,
     expansion: str,
@@ -583,11 +599,12 @@ async def adminremovemount(
     bot_log.info("/adminremovemount OK")
 
 
-@bot.slash_command(name="mymounts", description="View your mounts.")
+@bot.slash_command(name="mymounts", description="View your mounts")
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Expansion to list mounts from",
 )
 async def mymounts(
     ctx: discord.ApplicationContext,
@@ -639,14 +656,15 @@ async def mymounts(
 
 @bot.slash_command(
     name="adminusermounts",
-    description="(Admin only) View another users mounts.",
+    description="(Admin only) View another users mounts",
 )
 @commands.has_role(547835267394830348)
-@discord.option("user_name", type=str)
+@discord.option("user_name", type=str, description="User to check mounts for")
 @discord.option(
     "expansion",
     type=str,
     autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+    description="Expansion to list mounts from",
 )
 async def adminusermounts(
     ctx: discord.ApplicationContext,
@@ -697,9 +715,9 @@ async def adminusermounts(
 
 @bot.slash_command(
     name="mostneeded",
-    description="Count the most needed mounts.",
+    description="Count the most needed mounts",
 )
-@discord.option("n_out", type=int, description="Number of results to output.")
+@discord.option("n_out", type=int, description="Number of results to output")
 async def mostneeded(ctx: discord.ApplicationContext, n_out: int) -> None:
     """Count which mounts are needed by the most users."""
     bot_log.info("/adminusermounts invoked by %s", ctx.author.name)
