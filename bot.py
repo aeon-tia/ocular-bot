@@ -40,7 +40,8 @@ def main() -> None:
     load_dotenv()
     cog_list = ["general", "adminonly", "dataops"]
     for cog in cog_list:
-        bot.load_extension(f"cogs.{cog}")
+        # bot.load_extension(f"cogs.{cog}")
+        bot.load_extension(f"src.ocular.{cog}")
     bot.run(os.getenv("TOKEN"))
 
 
