@@ -7,6 +7,8 @@ from logging.handlers import RotatingFileHandler
 import discord
 from dotenv import load_dotenv
 
+from src.ocular.operations import DataBase
+
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
@@ -23,6 +25,13 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 bot = discord.Bot()
+
+
+@bot.event
+async def on_ready() -> None:
+    """Create DB and print status message when bot comes online."""
+    database = DataBase()
+    await database.init_tables()
 
 
 def main() -> None:

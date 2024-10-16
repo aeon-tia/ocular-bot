@@ -31,12 +31,6 @@ class General(commands.Cog):
         """Store general use commands."""
         self.bot = bot
 
-    @discord.event
-    async def on_ready(self: Self) -> None:
-        """Create DB and print status message when bot comes online."""
-        database = DataBase()
-        await database.init_tables()
-
     @discord.slash_command(name="ocular", description="Confirm the bot is responsive")
     async def ocular(self: Self, ctx: discord.ApplicationContext) -> None:
         """Check if the bot responds."""
