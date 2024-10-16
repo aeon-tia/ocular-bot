@@ -251,18 +251,18 @@ class General(commands.Cog):
 
     @discord.slash_command(
         name="mostneeded",
-        description="Count the most needed mounts",
+        description="Display the top n most needed mounts",
     )
-    @discord.option("n_out", type=int, description="Number of results to output")
+    @discord.option("n", type=int, description="Number of results to output")
     async def mostneeded(
         self: Self,
         ctx: discord.ApplicationContext,
-        n_out: int,
+        n: int,
     ) -> None:
-        """Display the top `n_out` most needed mounts."""
+        """Display the top n most needed mounts."""
         database = DataBase()
         needed_mounts = await database.summarize_needed_mounts()
-        output = needed_mounts[0:n_out]
+        output = needed_mounts[0:n]
         item_expansion_list = output.select("item_expac").to_series().to_list()
         item_name_list = output.select("item_name").to_series().to_list()
         item_count_list = (
