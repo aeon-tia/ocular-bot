@@ -32,6 +32,7 @@ async def on_ready() -> None:
     """Create DB and print status message when bot comes online."""
     database = DataBase()
     await database.init_tables()
+    logger.info("%s is online!", bot.user)
 
 
 def main() -> None:
