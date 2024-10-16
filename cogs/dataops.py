@@ -1,4 +1,5 @@
 """Cog storing commands for modifying the database."""
+
 from typing import Self
 
 import discord
@@ -29,6 +30,216 @@ class DataOps(commands.Cog):
     def __init__(self: Self, bot: discord.Bot) -> None:
         """Store database modification commands."""
         self.bot = bot
+
+    @discord.slash_command(
+        name="dbcreatemount",
+        description="(Admin only) Create a new mount in the database",
+    )
+    @commands.has_role(547835267394830348)
+    @discord.option(
+        "expansion",
+        type=str,
+        autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+        description="Mount expansion",
+    )
+    @discord.option(
+        "name",
+        type=str,
+        autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+        description="Mount name to create",
+    )
+    async def dbcreatemount(
+        self: Self,
+        ctx: discord.ApplicationContext,
+        expansion: str,
+        name: str,
+    ) -> None:
+        """Create new mounts in the database."""
+        database = DataBase()
+        item_id = await database.get_item_id(name)
+        already_exists = len(item_id) != 0
+        if already_exists:
+            await ctx.send_response(
+                content="I already have a mount with this name in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        else:
+            await database.add_new_item(expansion, name)
+            await ctx.send_response(
+                content=f"Created `{expansion}` mount `{name}`",
+                ephemeral=True,
+                delete_after=90,
+            )
+
+    @discord.slash_command(
+        name="dbdeletemount",
+        description="(Admin only) Delete a mount from the database",
+    )
+    @commands.has_role(547835267394830348)
+    @discord.option(
+        "expansion",
+        type=str,
+        autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+        description="Mount expansion",
+    )
+    @discord.option(
+        "name",
+        type=str,
+        autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+        description="Mount name to delete",
+    )
+    async def dbdeletemount(
+        self: Self,
+        ctx: discord.ApplicationContext,
+        expansion: str,
+        name: str,
+    ) -> None:
+        """Delete a mount from the database."""
+        database = DataBase()
+        item_id = await database.get_item_id(name)
+        no_match = len(item_id) == 0
+        if no_match:
+            await ctx.send_response(
+                content="I don't have a mount with this name in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        else:
+            await database.delete_item(name)
+            await ctx.send_response(
+                content=f"Deleted `{expansion}` mount `{name}` from the database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+
+    @discord.slash_command(
+        name="dbrenamemount",
+        description="(Admin only) Rename a mount in the database",
+    )
+    @commands.has_role(547835267394830348)
+    @discord.option(
+        "expansion",
+        type=str,
+        autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
+        description="Mount expansion",
+    )
+    @discord.option(
+        "from_name",
+        type=str,
+        autocomplete=discord.utils.basic_autocomplete(get_mount_names),
+        description="Mount name to change",
+    )
+    @discord.option("to_name", type=str, description="Mount name to assign")
+    async def dbrenamemount(
+        self: Self,
+        ctx: discord.ApplicationContext,
+        expansion: str,
+        from_name: str,
+        to_name: str,
+    ) -> None:
+        """Edit the name of a mount in the database."""
+        database = DataBase()
+        from_item_id = await database.get_item_id(from_name)
+        to_item_id = await database.get_item_id(to_name)
+        no_from_name_found = len(from_item_id) == 0
+        to_name_found = len(to_item_id) != 0
+        if no_from_name_found:
+            await ctx.send_response(
+                content=f"I don't have a mount named `{from_name}` in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        elif to_name_found:
+            await ctx.send_response(
+                content=f"I already have a mount named `{to_name}` in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        else:
+            await database.edit_item_name(from_name, to_name)
+            await ctx.send_response(
+                content=f"Renamed `{expansion}` mount `{from_name}` to `{to_name}`.",
+                ephemeral=True,
+                delete_after=90,
+            )
+
+    @discord.slash_command(
+        name="dbrenameuser",
+        description="(Admin only) Change the name of a user in the database",
+    )
+    @commands.has_role(547835267394830348)
+    @discord.option("from_name", type=str, description="User name to change")
+    @discord.option("to_name", type=str, description="User name to assign")
+    async def dbrenameuser(
+        self: Self,
+        ctx: discord.ApplicationContext,
+        from_name: str,
+        to_name: str,
+    ) -> None:
+        """Change the name of a user in the database."""
+        database = DataBase()
+        from_name_exists = await database.check_user_exists(
+            check_col="user_name",
+            check_val=from_name,
+        )
+        to_name_exists = await database.check_user_exists(
+            check_col="user_name",
+            check_val=to_name,
+        )
+        if not from_name_exists:
+            await ctx.send_response(
+                content=f"I don't have a user named `{from_name}` in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        elif to_name_exists:
+            await ctx.send_response(
+                content=f"I already have a user named `{to_name}` in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        else:
+            user_id = await database.get_user_id(from_name)
+            query = "UPDATE users SET user_name = ? WHERE user_id = ?"
+            params = (to_name, user_id)
+            await database.db_execute_qmark(query, params)
+            await ctx.send_response(
+                content=f"User name `{from_name}` changed to `{to_name}`.",
+                ephemeral=True,
+                delete_after=90,
+            )
+
+    @discord.slash_command(
+        name="dbdeleteuser",
+        description="(Admin only) Delete a user from the database.",
+    )
+    @commands.has_role(547835267394830348)
+    @discord.option("name", type=str, description="Name of user to delete")
+    async def dbdeleteuser(
+        self: Self,
+        ctx: discord.ApplicationContext,
+        name: str,
+    ) -> None:
+        """Delete a user from the database."""
+        database = DataBase()
+        from_name_exists = await database.check_user_exists(
+            check_col="user_name",
+            check_val=name,
+        )
+        if not from_name_exists:
+            await ctx.send_response(
+                content=f"I don't have a user named `{name}` in my database.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        else:
+            await database.delete_user()
+            await ctx.send_response(
+                content=f"User name `{name}` deleted.",
+                ephemeral=True,
+                delete_after=90,
+            )
 
 
 def setup(bot: discord.Bot) -> None:
