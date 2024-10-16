@@ -8,17 +8,18 @@ import discord
 from dotenv import load_dotenv
 
 logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
     "{asctime} | {levelname:8s} | {funcName}:{lineno} {message}",
     style="{",
 )
 handler = RotatingFileHandler(
     filename="bot.log",
+    encoding="utf-8",
     maxBytes=5 * 1024 * 1024,
     backupCount=2,
 )
-logger.setFormatter(formatter)
+handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 bot = discord.Bot()
