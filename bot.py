@@ -7,27 +7,30 @@ from logging.handlers import RotatingFileHandler
 import discord
 from dotenv import load_dotenv
 
-log_formatter = logging.Formatter(
+logger = logging.getLogger("discord")
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
     "{asctime} | {levelname:8s} | {funcName}:{lineno} {message}",
     style="{",
 )
-log_handler = RotatingFileHandler(
+handler = RotatingFileHandler(
     filename="bot.log",
     maxBytes=5 * 1024 * 1024,
     backupCount=2,
 )
-log_handler.setFormatter(log_formatter)
-bot_log = logging.getLogger()
-bot_log.setLevel(logging.INFO)
-bot_log.addHandler(log_handler)
+logger.setFormatter(formatter)
+logger.addHandler(handler)
 
 bot = discord.Bot()
 
 
 def main() -> None:
     """Run program."""
-    bot_log.info("Launching Ocular")
+    logger.info("Launching Ocular")
     load_dotenv()
+    cog_list = ["general", "adminonly", "dataops"]
+    for cog in cog_list:
+        bot.load_extension(f"cogs.{cog}")
     bot.run(os.getenv("TOKEN"))
 
 
