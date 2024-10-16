@@ -24,7 +24,6 @@ bot_log = logging.getLogger()
 bot_log.setLevel(logging.INFO)
 bot_log.addHandler(log_handler)
 
-load_dotenv()
 bot = discord.Bot()
 
 
@@ -742,6 +741,7 @@ async def mostneeded(ctx: discord.ApplicationContext, n_out: int) -> None:
 def main() -> None:
     """Run program."""
     bot_log.info("Launching Ocular")
+    load_dotenv()
     bot.run(os.getenv("TOKEN"))
 
 
