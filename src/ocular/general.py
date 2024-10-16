@@ -3,6 +3,7 @@
 from typing import Self
 
 import discord
+import polars as pl
 from discord.ext import commands
 
 from src.ocular.operations import DataBase
@@ -258,17 +259,32 @@ class General(commands.Cog):
         ctx: discord.ApplicationContext,
         n_out: int,
     ) -> None:
-        """Count which mounts are needed by the most users."""
+        """Display the top `n_out` most needed mounts."""
         database = DataBase()
-        meeded_mounts = await database.summarize_needed_mounts()
-        output = meeded_mounts[0:n_out]
+        needed_mounts = await database.summarize_needed_mounts()
+        output = needed_mounts[0:n_out]
+        item_expansion_list = output.select("item_expac").to_series().to_list()
+        item_name_list = output.select("item_name").to_series().to_list()
+        item_count_list = (
+            output.select("need_count").cast(pl.String).to_series().to_list()
+        )
         embed = discord.Embed(
             title="Most commonly needed mounts",
             color=discord.Colour.blurple(),
         )
         embed.add_field(
-            name=f"Top `{n_out}`",
-            value=f" - {'\n - '.join(output)}",
+            name="Expansion",
+            value=f"{'\n '.join(item_expansion_list)}",
+            inline=True,
+        )
+        embed.add_field(
+            name="Mount",
+            value=f"{'\n '.join(item_name_list)}",
+            inline=True,
+        )
+        embed.add_field(
+            name="Needed by",
+            value=f"{'\n '.join(item_count_list)}",
             inline=True,
         )
         await ctx.send_response(embed=embed, ephemeral=True)
