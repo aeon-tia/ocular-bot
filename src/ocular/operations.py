@@ -404,14 +404,4 @@ class DataBase:
         summary = summary.join(mounts_table, on="item_id").select(
             ["item_expac", "item_name", "need_count"],
         )
-        return (
-            summary.with_columns(
-                pl.concat_str(
-                    [pl.col("item_expac"), pl.col("item_name"), pl.col("need_count")],
-                    separator=": ",
-                ).alias("output"),
-            )
-            .select("output")
-            .to_series()
-            .to_list()
-        )
+        return summary.sort(by="need_count", descending=True)
