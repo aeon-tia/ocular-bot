@@ -1,3 +1,3 @@
-# ocular.adminonly
+# Administrator commands
 
 ::: src.ocular.adminonly

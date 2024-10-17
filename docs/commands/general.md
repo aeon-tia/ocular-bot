@@ -1,3 +1,3 @@
-# ocular.general
+# General commands
 
 ::: src.ocular.general

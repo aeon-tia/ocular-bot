@@ -66,8 +66,9 @@ markdown_extensions:
 nav:
   - Home:
     - index.md
+  - Commands:
+    - General commands: commands/general.md
+    - Admin commands: commands/adminonly.md
+    - Database commands: commands/dataedit.md
   - API reference:
-    - api-reference/general.md
-    - api-reference/adminonly.md
-    - api-reference/dataedit.md
     - api-reference/operations.md

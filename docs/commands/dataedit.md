@@ -1,3 +1,3 @@
-# ocular.dataedit
+# Database commands
 
 ::: src.ocular.dataedit
