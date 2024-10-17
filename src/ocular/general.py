@@ -66,14 +66,17 @@ class General(commands.Cog):
             check_val=ctx.author.id,
         )
         if name_exists:
-            logger.warning("User %s already in database", name)
+            logger.warning("User %s already in database, cancelling", name)
             await ctx.send_response(
                 content="I already have a user with this name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         elif id_exists:
-            logger.warning("Discord ID %s already in database", ctx.author.id)
+            logger.warning(
+                "Discord ID %s already in database, cancelling",
+                ctx.author.id,
+            )
             await ctx.send_response(
                 content="I already have a user with your discord ID in my database.",
                 ephemeral=True,
@@ -112,22 +115,22 @@ class General(commands.Cog):
         autocomplete=discord.utils.basic_autocomplete(get_expansion_names),
         description="Expansion to list mounts from",
     )
-    async def mountlist(
+    async def mountnames(
         self: Self,
         ctx: discord.ApplicationContext,
         expansion: str,
     ) -> None:
         """Show a list of available mount names."""
-        logger.info("/mountlist invoked by %s", ctx.author.name)
+        logger.info("/mountnames invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
         embed = discord.Embed(
             title=f"{expansion.capitalize()} mounts",
-            description=f"Available mount names are: \n - {'\n - '.join(item_names)}",
+            description=f"Available mounts are: \n - {'\n - '.join(item_names)}",
             color=discord.Colour.blurple(),
         )
         await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
-        logger.info("/mountlist OK")
+        logger.info("/mountnames OK")
 
     @discord.slash_command(name="addmount", description="Add mounts to your list")
     @discord.option(
@@ -152,10 +155,18 @@ class General(commands.Cog):
         logger.info("/addmount invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
-        if name not in item_names:
-            logger.warning("Mount %s not found in database", name)
+        user_id = await database.get_user_from_discord_id(ctx.author.id)
+        if len(user_id) == 0:
+            logger.warning("User %s not registered, cancelling", ctx.author.name)
             await ctx.send_response(
-                content=f"`{name}` isn't a valid mount name in my database.",
+                content="I don't have you in my database! Add yourself with `/addme`.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        elif name not in item_names:
+            logger.warning("Mount %s not found in database, cancelling", name)
+            await ctx.send_response(
+                content=f"I don't have a `{expansion}` mount named `{name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -199,10 +210,18 @@ class General(commands.Cog):
         logger.info("/removemount invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
-        if name not in item_names:
-            logger.warning("Mount %s not found in database", name)
+        user_id = await database.get_user_from_discord_id(ctx.author.id)
+        if len(user_id) == 0:
+            logger.warning("User %s not registered, cancelling", ctx.author.name)
             await ctx.send_response(
-                content=f"`{name}` isn't a valid mount name in my database.",
+                content="I don't have you in my database! Add yourself with `/addme`.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        elif name not in item_names:
+            logger.warning("Mount %s not found in database, cancelling", name)
+            await ctx.send_response(
+                content=f"I don't have a `{expansion}` mount named `{name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -235,42 +254,51 @@ class General(commands.Cog):
         """View list of held and needed mounts."""
         logger.info("/mymounts invoked by %s", ctx.author.name)
         database = DataBase()
-        has_mounts = await database.list_user_items(
-            user=ctx.author.id,
-            check_type="has",
-            expansion=expansion,
-        )
-        needs_mounts = await database.list_user_items(
-            user=ctx.author.id,
-            check_type="needs",
-            expansion=expansion,
-        )
-        image_urls = {
-            "a realm reborn": "https://lds-img.finalfantasyxiv.com/h/-/pnlEUJhVj0vMO7dtJ5psZ84Vvg.jpg",
-            "heavensward": "https://lds-img.finalfantasyxiv.com/h/3/uN1BWnRvdTy5nT8izK6G4Hu3cI.jpg",
-            "stormblood": "https://lds-img.finalfantasyxiv.com/h/v/CBMATiZFo0BaxDrY2G483WScs4.jpg",
-            "shadowbringers": "https://lds-img.finalfantasyxiv.com/h/m/B56bwbNBbqkA9UlbmcZ_BeWIL8.jpg",
-            "endwalker": "https://lds-img.finalfantasyxiv.com/h/Q/YW-_Cq8HEN5QOH5PD5w9xF2-YI.jpg",
-            "dawntrail": "https://lds-img.finalfantasyxiv.com/h/Z/1Li39bwJmXi701FfGzRL_7LAZg.jpg",
-        }
-        image_url = image_urls[expansion]
-        embed = discord.Embed(
-            title=f"{expansion.capitalize()} mounts",
-            color=discord.Colour.blurple(),
-        )
-        embed.add_field(
-            name="Have",
-            value=f" - {'\n - '.join(has_mounts)}",
-            inline=True,
-        )
-        embed.add_field(
-            name="Need",
-            value=f" - {'\n - '.join(needs_mounts)}",
-            inline=True,
-        )
-        embed.set_image(url=image_url)
-        embed.set_thumbnail(url=ctx.author.avatar)
-        await ctx.respond(embed=embed)
+        user_id = await database.get_user_from_discord_id(ctx.author.id)
+        if len(user_id) == 0:
+            logger.warning("User %s not registered, cancelling", ctx.author.name)
+            await ctx.send_response(
+                content="I don't have you in my database! Add yourself with `/addme`.",
+                ephemeral=True,
+                delete_after=90,
+            )
+        else:
+            has_mounts = await database.list_user_items(
+                user=ctx.author.id,
+                check_type="has",
+                expansion=expansion,
+            )
+            needs_mounts = await database.list_user_items(
+                user=ctx.author.id,
+                check_type="needs",
+                expansion=expansion,
+            )
+            image_urls = {
+                "a realm reborn": "https://lds-img.finalfantasyxiv.com/h/-/pnlEUJhVj0vMO7dtJ5psZ84Vvg.jpg",
+                "heavensward": "https://lds-img.finalfantasyxiv.com/h/3/uN1BWnRvdTy5nT8izK6G4Hu3cI.jpg",
+                "stormblood": "https://lds-img.finalfantasyxiv.com/h/v/CBMATiZFo0BaxDrY2G483WScs4.jpg",
+                "shadowbringers": "https://lds-img.finalfantasyxiv.com/h/m/B56bwbNBbqkA9UlbmcZ_BeWIL8.jpg",
+                "endwalker": "https://lds-img.finalfantasyxiv.com/h/Q/YW-_Cq8HEN5QOH5PD5w9xF2-YI.jpg",
+                "dawntrail": "https://lds-img.finalfantasyxiv.com/h/Z/1Li39bwJmXi701FfGzRL_7LAZg.jpg",
+            }
+            image_url = image_urls[expansion]
+            embed = discord.Embed(
+                title=f"{expansion.capitalize()} mounts",
+                color=discord.Colour.blurple(),
+            )
+            embed.add_field(
+                name="Have",
+                value=f" - {'\n - '.join(has_mounts)}",
+                inline=True,
+            )
+            embed.add_field(
+                name="Need",
+                value=f" - {'\n - '.join(needs_mounts)}",
+                inline=True,
+            )
+            embed.set_image(url=image_url)
+            embed.set_thumbnail(url=ctx.author.avatar)
+            await ctx.respond(embed=embed)
         logger.info("/mymounts OK")
 
     @discord.slash_command(

@@ -63,7 +63,11 @@ class DataOps(commands.Cog):
         item_id = await database.get_item_id(name)
         already_exists = len(item_id) != 0
         if already_exists:
-            logger.warning("Expansion %s mount %s already in database", expansion, name)
+            logger.warning(
+                "Expansion %s mount %s already in database, cancelling",
+                expansion,
+                name,
+            )
             await ctx.send_response(
                 content="I already have a mount with this name in my database.",
                 ephemeral=True,
@@ -108,7 +112,11 @@ class DataOps(commands.Cog):
         item_id = await database.get_item_id(name)
         no_match = len(item_id) == 0
         if no_match:
-            logger.warning("Expansion %s mount %s not found", expansion, name)
+            logger.warning(
+                "Expansion %s mount %s not found, cancelling",
+                expansion,
+                name,
+            )
             await ctx.send_response(
                 content="I don't have a mount with this name in my database.",
                 ephemeral=True,
@@ -157,7 +165,11 @@ class DataOps(commands.Cog):
         no_from_name_found = len(from_item_id) == 0
         to_name_found = len(to_item_id) != 0
         if no_from_name_found:
-            logger.warning("Expansion %s mount %s not found", expansion, from_name)
+            logger.warning(
+                "Expansion %s mount %s not found, cancelling",
+                expansion,
+                from_name,
+            )
             await ctx.send_response(
                 content=f"I don't have a mount named `{from_name}` in my database.",
                 ephemeral=True,
@@ -165,7 +177,9 @@ class DataOps(commands.Cog):
             )
         elif to_name_found:
             logger.warning(
-                "Expansion %s mount %s already in database", expansion, to_name,
+                "Expansion %s mount %s already in database, cancelling",
+                expansion,
+                to_name,
             )
             await ctx.send_response(
                 content=f"I already have a mount named `{to_name}` in my database.",
@@ -174,7 +188,10 @@ class DataOps(commands.Cog):
             )
         else:
             logger.info(
-                "Renaming expansion %s mount %s to %s", expansion, from_name, to_name,
+                "Renaming expansion %s mount %s to %s",
+                expansion,
+                from_name,
+                to_name,
             )
             await database.edit_item_name(from_name, to_name)
             await ctx.send_response(
@@ -209,14 +226,14 @@ class DataOps(commands.Cog):
             check_val=to_name,
         )
         if not from_name_exists:
-            logger.warning("User %s not found", from_name)
+            logger.warning("User %s not found, cancelling", from_name)
             await ctx.send_response(
                 content=f"I don't have a user named `{from_name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         elif to_name_exists:
-            logger.warning("User %s already in database", to_name)
+            logger.warning("User %s already in database, cancelling", to_name)
             await ctx.send_response(
                 content=f"I already have a user named `{to_name}` in my database.",
                 ephemeral=True,
@@ -254,7 +271,7 @@ class DataOps(commands.Cog):
             check_val=name,
         )
         if not from_name_exists:
-            logger.warning("User %s not found", name)
+            logger.warning("User %s not found, cancelling", name)
             await ctx.send_response(
                 content=f"I don't have a user named `{name}` in my database.",
                 ephemeral=True,
