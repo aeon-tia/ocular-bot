@@ -57,7 +57,19 @@ class DataEdit(commands.Cog):
         expansion: str,
         name: str,
     ) -> None:
-        """Create new mounts in the database."""
+        """Create new mounts in the database.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            Name of the FFXIV expansion to create mounts in.
+        name : str
+            Name of mount to create.
+
+        """
         logger.info("/dbcreatemount invoked by %s", ctx.author.name)
         database = DataBase()
         item_id = await database.get_item_id(name)
@@ -106,7 +118,19 @@ class DataEdit(commands.Cog):
         expansion: str,
         name: str,
     ) -> None:
-        """Delete a mount from the database."""
+        """Delete a mount from the database.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            Name of the FFXIV expansion to delete mounts from.
+        name : str
+            Name of mount to delete.
+
+        """
         logger.info("/dbdeletemount invoked by %s", ctx.author.name)
         database = DataBase()
         item_id = await database.get_item_id(name)
@@ -157,7 +181,21 @@ class DataEdit(commands.Cog):
         from_name: str,
         to_name: str,
     ) -> None:
-        """Edit the name of a mount in the database."""
+        """Edit the name of a mount in the database.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            Name of the FFXIV expansion to create mounts in.
+        from_name : str
+            Name of mount to change.
+        to_name : str
+            Name of mount to assign.
+
+        """
         logger.info("/dbrenamemount invoked by %s", ctx.author.name)
         database = DataBase()
         from_item_id = await database.get_item_id(from_name)
@@ -214,7 +252,19 @@ class DataEdit(commands.Cog):
         from_name: str,
         to_name: str,
     ) -> None:
-        """Change the name of a user in the database."""
+        """Change the name of a user in the database.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        from_name : str
+            Name of user to change.
+        to_name : str
+            Name of user to assign.
+
+        """
         logger.info("/dbrenameuser invoked by %s", ctx.author.name)
         database = DataBase()
         from_name_exists = await database.check_user_exists(
@@ -263,7 +313,17 @@ class DataEdit(commands.Cog):
         ctx: discord.ApplicationContext,
         name: str,
     ) -> None:
-        """Delete a user from the database."""
+        """Delete a user from the database.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        name : str
+            Name of user to delete.
+
+        """
         logger.info("/dbdeleteuser invoked by %s", ctx.author.name)
         database = DataBase()
         from_name_exists = await database.check_user_exists(

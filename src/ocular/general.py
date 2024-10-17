@@ -52,7 +52,17 @@ class General(commands.Cog):
         description="Name to give yourself in the database",
     )
     async def addme(self: Self, ctx: discord.ApplicationContext, name: str) -> None:
-        """Add user to the user table."""
+        """Add user to the user table.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        name : str
+            Name to assign the command invoker in the database user table.
+
+        """
         logger.info("/addme invoked by %s", ctx.author.name)
         database = DataBase()
         # Check if user name is already added
@@ -95,7 +105,15 @@ class General(commands.Cog):
 
     @discord.slash_command(name="userlist", description="List users in the database")
     async def userlist(self: Self, ctx: discord.ApplicationContext) -> None:
-        """Get the list of all users in the database."""
+        """Get the list of all users in the database.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+
+        """
         logger.info("/userlist invoked by %s", ctx.author.name)
         database = DataBase()
         user_table = await database.read_table_polars("users")
@@ -120,7 +138,17 @@ class General(commands.Cog):
         ctx: discord.ApplicationContext,
         expansion: str,
     ) -> None:
-        """Show a list of available mount names."""
+        """Show a list of available mount names.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            Name of the FFXIV expansion to list mounts from.
+
+        """
         logger.info("/mountnames invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
@@ -151,7 +179,19 @@ class General(commands.Cog):
         expansion: str,
         name: str,
     ) -> None:
-        """Add items to a user in the status table."""
+        """Add items to a user in the status table.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            The FFXIV expansion the mount to add is from.
+        name : str
+            Name of the mount to add.
+
+        """
         logger.info("/addmount invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
@@ -206,7 +246,19 @@ class General(commands.Cog):
         expansion: str,
         name: str,
     ) -> None:
-        """Add items to a user in the status table."""
+        """Add items to a user in the status table.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            The FFXIV expansion the mount to remove is from.
+        name : str
+            Name of the mount to remove.
+
+        """
         logger.info("/removemount invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
@@ -251,7 +303,17 @@ class General(commands.Cog):
         ctx: discord.ApplicationContext,
         expansion: str,
     ) -> None:
-        """View list of held and needed mounts."""
+        """View list of held and needed mounts.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            The FFXIV expansion to list your mounts from.
+
+        """
         logger.info("/mymounts invoked by %s", ctx.author.name)
         database = DataBase()
         user_id = await database.get_user_from_discord_id(ctx.author.id)
@@ -311,7 +373,18 @@ class General(commands.Cog):
         ctx: discord.ApplicationContext,
         n: int,
     ) -> None:
-        """Display the top n most needed mounts."""
+        """Display the top n most needed mounts.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        n : int
+            Number of results to display. The top n most needed mounts
+            will be shown.
+
+        """
         logger.info("/mostneeded invoked by %s", ctx.author.name)
         database = DataBase()
         needed_mounts = await database.summarize_needed_mounts()

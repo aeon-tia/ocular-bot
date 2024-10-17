@@ -100,7 +100,16 @@ class DataBase:
             await self.init_status_table()
 
     def create_user_row(self: Self, name: str, discord_id: int) -> tuple[dict]:
-        """Create a new user ID as a row for the user table."""
+        """Create a new user ID as a row for the user table.
+
+        Parameters
+        ----------
+        name : str
+            Name of the user to add.
+        discord_id : int
+            Discord ID of the user to add.
+
+        """
         new_id = uuid6.uuid7().hex
         return ({"user_name": name, "user_id": new_id, "user_discord_id": discord_id},)
 
@@ -160,7 +169,14 @@ class DataBase:
             return user_row["user_id"]
 
     async def get_user_discord_id(self: Self, user_name: str) -> int:
-        """Get a user discord ID from user name."""
+        """Get a user discord ID from user name.
+
+        Parameters
+        ----------
+        user_name : str
+            Name of user to get discord ID for.
+
+        """
         user_table = await self.read_table_polars("users")
         user_row = user_table.filter(pl.col("user_name") == user_name)
         if user_row.shape == (0, 1):
@@ -225,7 +241,14 @@ class DataBase:
         return table
 
     async def append_new_status(self: Self, discord_id: str) -> tuple[dict]:
-        """Create status table rows for a new user."""
+        """Create status table rows for a new user.
+
+        Parameters
+        ----------
+        discord_id : str
+            Discord ID of the user being added.
+
+        """
         user = await self.get_user_from_discord_id(discord_id)
         mounts = await self.read_table_polars("mounts")
         rows = tuple(
@@ -241,7 +264,14 @@ class DataBase:
         self: Self,
         item_name: str,
     ) -> str:
-        """Get a list of item IDs from a specified item table."""
+        """Get an item ID from the mounts table.
+
+        Parameters
+        ----------
+        item_name : str
+            Name of the mount to get the database ID for.
+
+        """
         items = await self.read_table_polars("mounts")
         item_id = items.filter(item_name=item_name).select("item_id")
         if item_id.shape != (0, 1):
@@ -254,7 +284,18 @@ class DataBase:
         user: int,
         item_names: list[str],
     ) -> tuple[dict]:
-        """Update entries for a user in the status table."""
+        """Update entries for a user in the status table.
+
+        Parameters
+        ----------
+        action : Literal["add", "remove"]
+            Whether to add or remove the item from the user.
+        user : str
+            Name of the user to add or remove items for.
+        item_names : str
+            Name of item to add or remove from the user.
+
+        """
         user_id = await self.get_user_from_discord_id(user)
         items = await self.get_item_id(item_names)
         if action == "add":
@@ -277,7 +318,14 @@ class DataBase:
         self: Self,
         table_name: Literal["users", "mounts", "status"],
     ) -> bool:
-        """Check the shape of a database table."""
+        """Check the shape of a database table.
+
+        Parameters
+        ----------
+        table_name : Literal["users", "mounts", "status"]
+            Name of the table to check the shape of.
+
+        """
         table = await self.read_table_polars(table_name)
         return table.shape
 
@@ -286,7 +334,16 @@ class DataBase:
         check_col: Literal["user_name", "user_id", "user_discord_id"],
         check_val: str | int,
     ) -> bool:
-        """Check if a user already exists in the users table."""
+        """Check if a user already exists in the users table.
+
+        Parameters
+        ----------
+        check_col : Literal["user_name", "user_id", "user_discord_id"]
+            Column name to check in.
+        check_val : str | int
+            Value to check for in column.
+
+        """
         table = await self.read_table_polars("users")
         if table.shape[0] == 0:
             return False
@@ -298,7 +355,16 @@ class DataBase:
         self: Self,
         expansion: None | str = None,
     ) -> list[str]:
-        """Get a list of item names from a DB table."""
+        """Get a list of item names from a DB table.
+
+        Parameters
+        ----------
+        expansion : None | str
+            If none, returns the names of every mount in the table. If
+            string must be the name of an expansion, and mount names
+            from that expansion will be listed.
+
+        """
         table = await self.read_table_polars("mounts")
         if expansion is None:
             return table.select("item_name").to_series().to_list()
@@ -322,7 +388,18 @@ class DataBase:
         check_type: Literal["has", "needs"],
         expansion: str,
     ) -> list[str]:
-        """Get list of mounts a user has or needs."""
+        """Get list of mounts a user has or needs.
+
+        Parameters
+        ----------
+        user : int
+            Discord ID of user to list items for.
+        check_type : Literal["has", "needs"]
+            Whether to list items the user has or needs.
+        expansion : str
+            Name of the expansion to list mounts from.
+
+        """
         user_id = await self.get_user_from_discord_id(user)
         status_table = await self.read_table_polars("status")
         item_table = await self.read_table_polars("mounts")
@@ -348,7 +425,16 @@ class DataBase:
         old_name: str,
         new_name: str,
     ) -> None:
-        """Edit an item name."""
+        """Edit an item name.
+
+        Parameters
+        ----------
+        old_name : str
+            Mount name to change.
+        new_name : str
+            Mount name to assign.
+
+        """
         item_id = await self.get_item_id(old_name)
         query = "UPDATE mounts SET item_name = ? WHERE item_id = ?"
         params = (new_name, item_id[0])
@@ -359,7 +445,16 @@ class DataBase:
         expansion: str,
         name: str,
     ) -> None:
-        """Edit an item name."""
+        """Edit an item name.
+
+        Parameters
+        ----------
+        expansion : str
+            Expansion name to add items in.
+        name : str
+            Name of item to add under expansion.
+
+        """
         new_mount_row = self.create_item_row(name, expansion)
         await self.append_to_mount_table(new_mount_row)
         user_table = await self.read_table_polars("users")
@@ -377,7 +472,14 @@ class DataBase:
         self: Self,
         name: str,
     ) -> None:
-        """Remove mounts from the database."""
+        """Remove mounts from the database.
+
+        Parameters
+        ----------
+        name : str
+            Name of mount to delete from the database.
+
+        """
         item_id = await self.get_item_id(name)
         params = tuple(item_id)
         mounts_query = "DELETE FROM mounts WHERE item_id = ?"
@@ -386,7 +488,14 @@ class DataBase:
         await self.db_execute_qmark(status_query, params)
 
     async def delete_user(self: Self, name: str) -> None:
-        """Remove users from the database."""
+        """Remove users from the database.
+
+        Parameters
+        ----------
+        name : str
+            Name of user to delete from the database.
+
+        """
         user_id = await self.get_user_id(name)
         params = (user_id,)
         user_query = "DELETE FROM users WHERE user_id = ?"
@@ -395,7 +504,7 @@ class DataBase:
         await self.db_execute_qmark(status_query, params)
 
     async def summarize_needed_mounts(self: Self) -> list[str]:
-        """Return list summarizing how many people need what."""
+        """Return list summarizing how many users need what."""
         status_table = await self.read_table_polars("status")
         mounts_table = await self.read_table_polars("mounts")
         summary = status_table.group_by("item_id").agg(

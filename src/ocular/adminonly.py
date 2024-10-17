@@ -59,7 +59,21 @@ class AdminOnly(commands.Cog):
         mount_name: str,
         user_name: str,
     ) -> None:
-        """Add items to a user other than the author in the status table."""
+        """Add items to a user other than the author in the status table.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            Name of the FFXIV expansion to add mounts from.
+        mount_name : str
+            Name of the mount to add.
+        user_name : str
+            Name of the user to add mounts for.
+
+        """
         logger.info("/adminaddmount invoked by %s", ctx.author.name)
         database = DataBase()
         user_did = await database.get_user_discord_id(user_name)
@@ -117,7 +131,21 @@ class AdminOnly(commands.Cog):
         mount_name: str,
         user_name: str,
     ) -> None:
-        """Add items to a user other than the author in the status table."""
+        """Add items to a user other than the author in the status table.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        expansion : str
+            Name of the FFXIV expansion to remove mounts from.
+        mount_name : str
+            Name of the mount to remove.
+        user_name : str
+            Name of the user to remove mounts for.
+
+        """
         logger.info("/adminremovemount invoked by %s", ctx.author.name)
         database = DataBase()
         user_did = await database.get_user_discord_id(user_name)
@@ -168,7 +196,19 @@ class AdminOnly(commands.Cog):
         user_name: str,
         expansion: str,
     ) -> None:
-        """View list of held and needed mounts."""
+        """View list of held and needed mounts.
+
+        Parameters
+        ----------
+        ctx : discord.ApplicationContext
+            Discord context. Used for interacting with the command
+            invoker.
+        user_name : str
+            Name of user to display mounts for.
+        expansion : str
+            Name of the FFXIV expansion to display mounts from.
+
+        """
         logger.info("/adminusermounts invoked by %s", ctx.author.name)
         database = DataBase()
         user_did = await database.get_user_discord_id(user_name)
