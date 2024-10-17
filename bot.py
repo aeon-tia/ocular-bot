@@ -39,7 +39,7 @@ def main() -> None:
     """Run program."""
     logger.info("Launching Ocular")
     load_dotenv()
-    cog_list = ["general", "adminonly", "dataops"]
+    cog_list = ["general", "adminonly", "dataedit"]
     for cog in cog_list:
         bot.load_extension(f"src.ocular.{cog}")
     bot.run(os.getenv("TOKEN"))

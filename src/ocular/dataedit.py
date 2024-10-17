@@ -27,7 +27,7 @@ async def get_expansion_names(ctx: discord.AutocompleteContext) -> list[str]:  #
     return expansions  # noqa: RET504
 
 
-class DataOps(commands.Cog):
+class DataEdit(commands.Cog):
     """Class to hold database modification commands."""
 
     def __init__(self: Self, bot: discord.Bot) -> None:
@@ -290,4 +290,4 @@ class DataOps(commands.Cog):
 
 def setup(bot: discord.Bot) -> None:
     """Allow the bot to use this cog."""
-    bot.add_cog(DataOps(bot))
+    bot.add_cog(DataEdit(bot))
