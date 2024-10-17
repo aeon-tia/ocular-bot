@@ -164,14 +164,18 @@ class DataOps(commands.Cog):
                 delete_after=90,
             )
         elif to_name_found:
-            logger.warning("Expansion %s mount %s already in database", expansion, to_name)
+            logger.warning(
+                "Expansion %s mount %s already in database", expansion, to_name,
+            )
             await ctx.send_response(
                 content=f"I already have a mount named `{to_name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
-            logger.info("Renaming expansion %s mount %s to %s", expansion, from_name, to_name)
+            logger.info(
+                "Renaming expansion %s mount %s to %s", expansion, from_name, to_name,
+            )
             await database.edit_item_name(from_name, to_name)
             await ctx.send_response(
                 content=f"Renamed `{expansion}` mount `{from_name}` to `{to_name}`.",
