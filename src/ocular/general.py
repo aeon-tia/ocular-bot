@@ -1,5 +1,6 @@
 """Cog storing commands for general use."""
 
+import logging
 from typing import Self
 
 import discord
@@ -7,6 +8,8 @@ import polars as pl
 from discord.ext import commands
 
 from src.ocular.operations import DataBase
+
+logger = logging.getLogger("discord")
 
 
 async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
@@ -35,7 +38,9 @@ class General(commands.Cog):
     @discord.slash_command(name="ocular", description="Confirm the bot is responsive")
     async def ocular(self: Self, ctx: discord.ApplicationContext) -> None:
         """Check if the bot responds."""
+        logger.info("/ocular invoked by %s", ctx.author.name)
         await ctx.respond("We stand together!")
+        logger.info("/ocular OK")
 
     @discord.slash_command(
         name="addme",
@@ -48,6 +53,7 @@ class General(commands.Cog):
     )
     async def addme(self: Self, ctx: discord.ApplicationContext, name: str) -> None:
         """Add user to the user table."""
+        logger.info("/addme invoked by %s", ctx.author.name)
         database = DataBase()
         # Check if user name is already added
         name_exists = await database.check_user_exists(
@@ -60,18 +66,21 @@ class General(commands.Cog):
             check_val=ctx.author.id,
         )
         if name_exists:
+            logger.warning("User %s already in database", name)
             await ctx.send_response(
                 content="I already have a user with this name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         elif id_exists:
+            logger.warning("Discord ID %s already in database", ctx.author.id)
             await ctx.send_response(
                 content="I already have a user with your discord ID in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
+            logger.info("Adding %s to the database as %s", ctx.author.name, name)
             await database.append_new_user(name=name, discord_id=ctx.author.id)
             await database.append_new_status(discord_id=ctx.author.id)
             await ctx.send_response(
@@ -79,10 +88,12 @@ class General(commands.Cog):
                 ephemeral=True,
                 delete_after=90,
             )
+        logger.info("/addme OK")
 
     @discord.slash_command(name="userlist", description="List users in the database")
     async def userlist(self: Self, ctx: discord.ApplicationContext) -> None:
         """Get the list of all users in the database."""
+        logger.info("/userlist invoked by %s", ctx.author.name)
         database = DataBase()
         user_table = await database.read_table_polars("users")
         user_list = user_table.select("user_name").to_series().to_list()
@@ -92,6 +103,7 @@ class General(commands.Cog):
             color=discord.Colour.blurple(),
         )
         await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
+        logger.info("/userlist OK")
 
     @discord.slash_command(name="mountlist", description="List available mount names")
     @discord.option(
@@ -106,6 +118,7 @@ class General(commands.Cog):
         expansion: str,
     ) -> None:
         """Show a list of available mount names."""
+        logger.info("/mountlist invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
         embed = discord.Embed(
@@ -114,6 +127,7 @@ class General(commands.Cog):
             color=discord.Colour.blurple(),
         )
         await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
+        logger.info("/mountlist OK")
 
     @discord.slash_command(name="addmount", description="Add mounts to your list")
     @discord.option(
@@ -135,15 +149,18 @@ class General(commands.Cog):
         name: str,
     ) -> None:
         """Add items to a user in the status table."""
+        logger.info("/addmount invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
         if name not in item_names:
+            logger.warning("Mount %s not found in database", name)
             await ctx.send_response(
                 content=f"`{name}` isn't a valid mount name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
+            logger.info("Adding mount %s for %s", name, ctx.author.name)
             await database.update_user_items(
                 action="add",
                 user=ctx.author.id,
@@ -154,6 +171,7 @@ class General(commands.Cog):
                 ephemeral=True,
                 delete_after=90,
             )
+        logger.info("/addmount OK")
 
     @discord.slash_command(
         name="removemount",
@@ -178,15 +196,18 @@ class General(commands.Cog):
         name: str,
     ) -> None:
         """Add items to a user in the status table."""
+        logger.info("/removemount invoked by %s", ctx.author.name)
         database = DataBase()
         item_names = await database.list_item_names(expansion)
         if name not in item_names:
+            logger.warning("Mount %s not found in database", name)
             await ctx.send_response(
                 content=f"`{name}` isn't a valid mount name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
+            logger.info("Removing mount %s from %s", name, ctx.author.name)
             await database.update_user_items(
                 user=ctx.author.id,
                 action="remove",
@@ -197,6 +218,7 @@ class General(commands.Cog):
                 ephemeral=True,
                 delete_after=90,
             )
+        logger.info("/removemount OK")
 
     @discord.slash_command(name="mymounts", description="View your mounts")
     @discord.option(
@@ -211,6 +233,7 @@ class General(commands.Cog):
         expansion: str,
     ) -> None:
         """View list of held and needed mounts."""
+        logger.info("/mymounts invoked by %s", ctx.author.name)
         database = DataBase()
         has_mounts = await database.list_user_items(
             user=ctx.author.id,
@@ -248,6 +271,7 @@ class General(commands.Cog):
         embed.set_image(url=image_url)
         embed.set_thumbnail(url=ctx.author.avatar)
         await ctx.respond(embed=embed)
+        logger.info("/mymounts OK")
 
     @discord.slash_command(
         name="mostneeded",
@@ -260,6 +284,7 @@ class General(commands.Cog):
         n: int,
     ) -> None:
         """Display the top n most needed mounts."""
+        logger.info("/mostneeded invoked by %s", ctx.author.name)
         database = DataBase()
         needed_mounts = await database.summarize_needed_mounts()
         output = needed_mounts[0:n]
@@ -288,6 +313,7 @@ class General(commands.Cog):
             inline=True,
         )
         await ctx.send_response(embed=embed, ephemeral=True)
+        logger.info("/mostneeded OK")
 
 
 def setup(bot: discord.Bot) -> None:

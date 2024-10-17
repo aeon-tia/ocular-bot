@@ -1,11 +1,14 @@
 """Cog storing commands for admin use only."""
 
+import logging
 from typing import Self
 
 import discord
 from discord.ext import commands
 
 from src.ocular.operations import DataBase
+
+logger = logging.getLogger("discord")
 
 
 async def get_mount_names(ctx: discord.AutocompleteContext) -> list[str]:
@@ -57,22 +60,26 @@ class AdminOnly(commands.Cog):
         user_name: str,
     ) -> None:
         """Add items to a user other than the author in the status table."""
+        logger.info("/adminaddmount invoked by %s", ctx.author.name)
         database = DataBase()
         user_did = await database.get_user_discord_id(user_name)
         item_names = await database.list_item_names(expansion)
         if len(user_did) == 0:
+            logger.warning("User %s not found", user_name)
             await ctx.send_response(
                 content=f"`{user_name}` isn't a valid user name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
-        if mount_name not in item_names:
+        elif mount_name not in item_names:
+            logger.warning("Mount %s not found", mount_name)
             await ctx.send_response(
                 content=f"`{mount_name}` isn't a valid mount name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
+            logger.info("Adding mount %s for user %s", mount_name, user_name)
             await database.update_user_items(
                 action="add",
                 user=user_did[0],
@@ -83,6 +90,7 @@ class AdminOnly(commands.Cog):
                 ephemeral=True,
                 delete_after=90,
             )
+        logger.info("/adminaddmount OK")
 
     @discord.slash_command(
         name="adminremovemount",
@@ -110,22 +118,26 @@ class AdminOnly(commands.Cog):
         user_name: str,
     ) -> None:
         """Add items to a user other than the author in the status table."""
+        logger.info("/adminremovemount invoked by %s", ctx.author.name)
         database = DataBase()
         user_did = await database.get_user_discord_id(user_name)
         item_names = await database.list_item_names(expansion)
         if len(user_did) == 0:
+            logger.warning("User %s not found", user_name)
             await ctx.send_response(
                 content=f"`{user_name}` isn't a valid user name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
-        if mount_name not in item_names:
+        elif mount_name not in item_names:
+            logger.warning("Mount %s not found", mount_name)
             await ctx.send_response(
                 content=f"`{mount_name}` isn't a valid mount name in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
+            logger.info("Removing mount %s from user %s", mount_name, user_name)
             await database.update_user_items(
                 action="remove",
                 user=user_did[0],
@@ -136,6 +148,7 @@ class AdminOnly(commands.Cog):
                 ephemeral=True,
                 delete_after=90,
             )
+        logger.info("/adminremovemount OK")
 
     @discord.slash_command(
         name="adminusermounts",
@@ -156,15 +169,18 @@ class AdminOnly(commands.Cog):
         expansion: str,
     ) -> None:
         """View list of held and needed mounts."""
+        logger.info("/adminusermounts invoked by %s", ctx.author.name)
         database = DataBase()
         user_did = await database.get_user_discord_id(user_name)
         if len(user_did) == 0:
+            logger.warning("User %s not found", user_name)
             await ctx.send_response(
                 content=f"`I don't have a user named `{user_name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         else:
+            logger.info("Listing mounts held by %s", user_name)
             has_mounts = await database.list_user_items(
                 user=user_did[0],
                 check_type="has",
@@ -190,6 +206,7 @@ class AdminOnly(commands.Cog):
                 inline=True,
             )
             await ctx.send_response(embed=embed, ephemeral=True)
+        logger.info("/adminusermounts OK")
 
 
 def setup(bot: discord.Bot) -> None:
