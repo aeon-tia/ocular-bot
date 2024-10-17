@@ -67,14 +67,14 @@ class AdminOnly(commands.Cog):
         if len(user_did) == 0:
             logger.warning("User %s not found, cancelling", user_name)
             await ctx.send_response(
-                content=f"`{user_name}` isn't a valid user name in my database.",
+                content=f"I don't have a user named `{user_name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         elif mount_name not in item_names:
             logger.warning("Mount %s not found, cancelling", mount_name)
             await ctx.send_response(
-                content=f"`{mount_name}` isn't a valid mount name in my database.",
+                content=f"I don't have a `{expansion}` mount named `{mount_name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -125,14 +125,14 @@ class AdminOnly(commands.Cog):
         if len(user_did) == 0:
             logger.warning("User %s not found, cancelling", user_name)
             await ctx.send_response(
-                content=f"`{user_name}` isn't a valid user name in my database.",
+                content=f"I don't have a user named `{user_name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )
         elif mount_name not in item_names:
             logger.warning("Mount %s not found, cancelling", mount_name)
             await ctx.send_response(
-                content=f"`{mount_name}` isn't a valid mount name in my database.",
+                content=f"I don't have a `{expansion}` mount named `{mount_name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -175,7 +175,7 @@ class AdminOnly(commands.Cog):
         if len(user_did) == 0:
             logger.warning("User %s not found, cancelling", user_name)
             await ctx.send_response(
-                content=f"`I don't have a user named `{user_name}` in my database.",
+                content=f"I don't have a user named `{user_name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )

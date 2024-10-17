@@ -68,7 +68,7 @@ class General(commands.Cog):
         if name_exists:
             logger.warning("User %s already in database, cancelling", name)
             await ctx.send_response(
-                content="I already have a user with this name in my database.",
+                content=f"I already have a user named `{name}` in my database.",
                 ephemeral=True,
                 delete_after=90,
             )

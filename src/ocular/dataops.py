@@ -69,7 +69,7 @@ class DataOps(commands.Cog):
                 name,
             )
             await ctx.send_response(
-                content="I already have a mount with this name in my database.",
+                content=f"I already have a `{expansion}` mount named `{name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -118,7 +118,7 @@ class DataOps(commands.Cog):
                 name,
             )
             await ctx.send_response(
-                content="I don't have a mount with this name in my database.",
+                content=f"I don't have a `{expansion}` mount named `{name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -171,7 +171,7 @@ class DataOps(commands.Cog):
                 from_name,
             )
             await ctx.send_response(
-                content=f"I don't have a mount named `{from_name}` in my database.",
+                content=f"I don't have a `{expansion}` mount named `{from_name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
@@ -182,7 +182,7 @@ class DataOps(commands.Cog):
                 to_name,
             )
             await ctx.send_response(
-                content=f"I already have a mount named `{to_name}` in my database.",
+                content=f"I already have a `{expansion}` mount named `{to_name}` in my database.",  # noqa: E501
                 ephemeral=True,
                 delete_after=90,
             )
