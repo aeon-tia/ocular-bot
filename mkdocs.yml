@@ -66,8 +66,8 @@ markdown_extensions:
 nav:
   - Home:
     - index.md
-  - User guide:
-    - user-guide/commands.md
-    - Item names: user-guide/entry-names.md
   - API reference:
+    - api-reference/general.md
+    - api-reference/adminonly.md
+    - api-reference/dataedit.md
     - api-reference/operations.md
