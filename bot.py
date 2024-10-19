@@ -12,7 +12,7 @@ from src.ocular.operations import DataBase
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter(
-    "{asctime} | {levelname} | {funcName}:{lineno} {message}",
+    "{asctime} | {levelname} | {funcName}: {message}",
     style="{",
 )
 handler = RotatingFileHandler(
