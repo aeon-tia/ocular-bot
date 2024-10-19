@@ -233,7 +233,7 @@ class AdminOnly(commands.Cog):
             )
             embed = discord.Embed(
                 title=f"{expansion.capitalize()} mounts for `{user_name}`",
-                color=discord.Colour.blurple(),
+                color=discord.Colour.blue(),
             )
             embed.add_field(
                 name="Have",

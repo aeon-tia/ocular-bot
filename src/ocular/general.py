@@ -121,7 +121,7 @@ class General(commands.Cog):
         embed = discord.Embed(
             title="Users",
             description=f"List of users in the database: \n - {'\n - '.join(user_list)}",  # noqa: E501
-            color=discord.Colour.blurple(),
+            color=discord.Colour.blue(),
         )
         await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
         logger.info("/userlist OK")
@@ -155,7 +155,7 @@ class General(commands.Cog):
         embed = discord.Embed(
             title=f"{expansion.capitalize()} mounts",
             description=f"Available mounts are: \n - {'\n - '.join(item_names)}",
-            color=discord.Colour.blurple(),
+            color=discord.Colour.blue(),
         )
         await ctx.send_response(embed=embed, ephemeral=True, delete_after=90)
         logger.info("/mountnames OK")
@@ -346,7 +346,7 @@ class General(commands.Cog):
             image_url = image_urls[expansion]
             embed = discord.Embed(
                 title=f"{expansion.capitalize()} mounts",
-                color=discord.Colour.blurple(),
+                color=discord.Colour.blue(),
             )
             embed.add_field(
                 name="Have",
@@ -396,7 +396,7 @@ class General(commands.Cog):
         )
         embed = discord.Embed(
             title="Most commonly needed mounts",
-            color=discord.Colour.blurple(),
+            color=discord.Colour.blue(),
         )
         embed.add_field(
             name="Expansion",
