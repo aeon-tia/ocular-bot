@@ -365,30 +365,25 @@ class General(commands.Cog):
 
     @discord.slash_command(
         name="mostneeded",
-        description="Display the top n most needed mounts",
+        description="Display the top ten most needed mounts",
     )
-    @discord.option("n", type=int, description="Number of results to output")
     async def mostneeded(
         self: Self,
         ctx: discord.ApplicationContext,
-        n: int,
     ) -> None:
-        """Display the top n most needed mounts.
+        """Display the top ten most needed mounts.
 
         Parameters
         ----------
         ctx : discord.ApplicationContext
             Discord context. Used for interacting with the command
             invoker.
-        n : int
-            Number of results to display. The top n most needed mounts
-            will be shown.
 
         """
         logger.info("/mostneeded invoked by %s", ctx.author.name)
         database = DataBase()
         needed_mounts = await database.summarize_needed_mounts()
-        output = needed_mounts[0:n]
+        output = needed_mounts[0:10]
         item_expansion_list = output.select("item_expac").to_series().to_list()
         item_name_list = output.select("item_name").to_series().to_list()
         item_count_list = (
